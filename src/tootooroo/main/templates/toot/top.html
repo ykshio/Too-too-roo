@@ -1,0 +1,79 @@
+<!-- templates/toot/top.html -->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Too-Too-Roo! トップページ</title>
+    <style>
+        /* CSS スタイルはここに追加 */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .toot-list {
+            margin-top: 20px;
+        }
+        .toot {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .toot-content {
+            margin-bottom: 5px;
+        }
+        .toot-meta {
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Too-Too-Roo! トップページ</h1>
+
+        {% if user.is_authenticated %}
+        <p>ようこそ、{{ user.username }} さん。</p>
+        <p><a href="{% url 'toot_new' %}">新しいトゥートを投稿する</a></p>
+        {% else %}
+        <p>ログインして、Too-Too-Roo! を楽しもう！</p>
+        <p><a href="{% url 'login' %}">ログインする</a> | <a href="{% url 'signup' %}">新規登録する</a></p>
+        {% endif %}
+
+        <div class="toot-list">
+            <h2>最新のトゥート</h2>
+            {% for toot in toots %}
+            <div class="toot">
+                <p class="toot-content">{{ toot.content }}</p>
+                <p class="toot-meta">
+                    投稿者: <a href="{% url 'user_detail' toot.user.pk %}">{{ toot.user.username }}</a> |
+                    投稿日時: {{ toot.created_at }} |
+                    <a href="{% url 'toot_detail' toot.pk %}">詳細を見る</a>
+                </p>
+            </div>
+            {% empty %}
+            <p>まだトゥートがありません。</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+
