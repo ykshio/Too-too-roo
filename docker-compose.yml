@@ -3,7 +3,7 @@ version: '3'
 services:
   django:
     build:
-      context: ./containers    # Dockerfileがあるディレクトリまでの相対パス
+      context: .    # Dockerfileがあるディレクトリまでの相対パス
       dockerfile: Dockerfile   # Dockerfileのファイル名
 
     container_name: django
@@ -19,6 +19,6 @@ services:
     environment:
       - DEBUG=True
 
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["python", "src/tootooroo/manage.py", "runserver", "0.0.0.0:8000"]
 
 
