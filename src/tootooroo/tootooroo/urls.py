@@ -16,11 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from main.views import top
 
 urlpatterns = [
-    path('', top, name='top'),  # トップページ
+    path('', include('main.urls')),  # mainアプリケーションのURLパターン
     path('admin/', admin.site.urls),  # 管理者ページ
-    path('main/', include('main.urls')),  # mainアプリケーションのURLパターン
 ]
 
