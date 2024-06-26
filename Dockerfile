@@ -27,7 +27,9 @@ RUN chmod +x /root/workspace/src/tootooroo/sqldiff \
 
 EXPOSE 8000
 
+#WORKDIR /root/workspace/src/tootooroo
+
 # Djangoの起動コマンド
-ENTRYPOINT ["python", "src/tootooroo/manage.py"]
-CMD ["runserver", "0.0.0.0:8000"]
+#ENTRYPOINT ["python", "manage.py"]
+#CMD ["runserver", "0.0.0.0:8000"]
 

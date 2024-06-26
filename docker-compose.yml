@@ -18,6 +18,8 @@ services:
 
     environment:
       - DEBUG=True
+      - COMPOSE_HTTP_TIMEOUT=200
+      - COMPOSE_LOG_LEVEL=DEBUG
 
     command: ["python", "src/tootooroo/manage.py", "runserver", "0.0.0.0:8000"]
 
