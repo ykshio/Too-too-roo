@@ -1,0 +1,34 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>トゥットゥルー♪</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="{% static 'snippets/css/style.css' %}">
+    {% block extraheader %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark">
+    <div class="container justify-content-between">
+        <a href="/" class="navbar-brand">トゥットゥルー♪</a>
+		<ul class="navbar-nav mr-md-2">
+				{% if user.is_authenticated %}
+				<form id="logout-form" method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link btn btn-link" style="padding: 0;">{{ user.username }}さん　ログアウト</button>
+                </form>
+				{% else %}
+				<li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
+				<li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">会員登録</a></li>
+				{% endif %}
+    </div>
+</nav>
+<main>
+    <div class="container">
+        {% block main %}{% endblock %}
+    </div>
+</main>
+</body>
+</html>
