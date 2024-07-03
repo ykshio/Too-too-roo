@@ -31,5 +31,5 @@ EXPOSE 8000
 
 # Djangoの起動コマンド
 #ENTRYPOINT ["python", "manage.py"]
-#CMD ["runserver", "0.0.0.0:8000"]
+#CMD ["runserver", "127.0.0.1:8000"]
 
