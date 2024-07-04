@@ -1,9 +1,10 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
 from django.shortcuts import render,get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
 from main.forms import TootForm
+from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # 既存のビュー
 def top(request):
@@ -19,9 +20,16 @@ class TopView(ListView):
     context_object_name = 'toots'
     ordering = ['-created_at']
     
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = TootForm()
+        if self.request.user.is_authenticated:
+            user = self.request.user.customuser
+            liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
+            context['liked_toots'] = liked_toots
+        else:
+            context['liked_toots'] = []
         return context
 
 class TootCreateView(CreateView):
@@ -95,14 +103,18 @@ class ReplyCreateView(CreateView):
         form.instance.toot = get_object_or_404(Toot, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
-class LikeTootView(RedirectView):
-    pattern_name = 'toot_detail'
-
+class LikeTootView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         user = self.request.user.customuser
         toot = get_object_or_404(Toot, pk=kwargs['pk'])
-        Like.objects.get_or_create(user=user, toot=toot)
-        return super().get_redirect_url(*args, **kwargs)
+        like, created = Like.objects.get_or_create(user=user, toot=toot)
+        if created:
+            toot.like_count += 1
+        else:
+            toot.likes.filter(user=user).delete()
+            toot.like_count -= 1
+        toot.save()
+        return self.request.META.get('HTTP_REFERER', '/')
 
 class RetootCreateView(RedirectView):
     pattern_name = 'toot_detail'
@@ -112,4 +124,3 @@ class RetootCreateView(RedirectView):
         toot = get_object_or_404(Toot, pk=kwargs['pk'])
         Retoot.objects.get_or_create(user=user, toot=toot)
         return super().get_redirect_url(*args, **kwargs)
-

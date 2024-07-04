@@ -17,6 +17,7 @@ class Toot(models.Model):
     created_at = models.DateTimeField('投稿日', auto_now_add=True)
     updated_at = models.DateTimeField('更新日', auto_now=True)
     original_toot = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='original_toot_retoots', verbose_name='元のトゥート')
+    like_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.content
