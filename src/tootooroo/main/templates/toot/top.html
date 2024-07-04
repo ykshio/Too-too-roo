@@ -1,35 +1,25 @@
 {% extends 'toot/base.html' %}
 {% block main %}
-<div class="welcome">
-    <h1 class="title">Linuxコマンド知恵袋</h1>
-    <p class="subtitle">知識を共有して助け合おう!</p>
-    {% if user.is_authenticated %}
-    <a class="btn btn-primary" href="{% url 'toot_new' %}">投稿する</a>
-    {% else %}
-    <a class="btn btn-primary" href="{% url 'login' %}">投稿する</a>
-    {% endif %}
+{% if toots %}
+{% for toot in toots %}
+<div class="card my-3">
+    <div class="card-body">
+        <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
+            <div class="d-flex align-items-center">
+                <img src="../../static/media/icon.png" alt="Default Image" height="50">
+                <div class="mx-2">
+                    <h5 class="mb-0">{{ toot.user }}</h5>
+                    <small class="text-muted">{{ toot.created_at }}</small>
+                </div>
+            </div>
+            <div class="mt-3">
+                <p class="mb-0">{{ toot.content|truncatewords:5 }}</p>
+            </div>
+        </a>
+    </div>
 </div>
-
-{% if snippets %}
-<table class="table">
-    <thead>
-    <tr>
-        <th>投稿者</th>
-        <th>投稿日</th>
-        <th>タイトル</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for snippet in snippets %}
-    <tr>
-        <th>{{ snippet.created_by.username }}</th>
-        <th>{{ snippet.created_at }}</th>
-        <th><a href="{% url 'snippet_detail' snippet.id %}">{{ snippet.title }}</a></th>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% endfor %}
 {% else %}
-<p>スニッペトはまだ投稿されていません．</p>
+<p>投稿はありません</p>
 {% endif %}
 {% endblock %}

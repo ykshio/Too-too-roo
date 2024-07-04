@@ -1,34 +1,82 @@
 {% load static %}
 {% load django_bootstrap5 %}
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>トゥットゥルー♪</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <link rel="stylesheet" href="{% static 'snippets/css/style.css' %}">
+    <script src="https://kit.fontawesome.com/e49b9fdb64.js" crossorigin="anonymous"></script>
     {% block extraheader %}{% endblock %}
 </head>
+
 <body>
-<nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark">
-    <div class="container justify-content-between">
-        <a href="/" class="navbar-brand">トゥットゥルー♪</a>
-		<ul class="navbar-nav mr-md-2">
-				{% if user.is_authenticated %}
-				<form id="logout-form" method="post" action="{% url 'logout' %}">
+    <nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark">
+        <div class="container justify-content-between">
+            <a href="/" class="navbar-brand"><img src="{% static 'media/icon.svg' %}" height="30px">トゥットゥルー♪</a>
+            <ul class="navbar-nav mr-md-2">
+                {% if user.is_authenticated %}
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="nav-link btn btn-link" style="padding: 0;">{{ user.username }}さん　ログアウト</button>
+                    <button type="submit" class="nav-link btn btn-link" style="padding: 0;">
+                        {{ user.username }}さん　ログアウト</button>
                 </form>
-				{% else %}
-				<li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
-				<li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">会員登録</a></li>
-				{% endif %}
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">会員登録</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <main>
+        <div class="container">
+            {% block main %}{% endblock %}
+        </div>
+    </main>
+    <footer class="fixed-bottom">
+        <div class="text-end pe-3 pb-3">
+            {% if user.is_authenticated %}
+            <button class="btn btn-primary text-light" data-bs-toggle="modal" data-bs-target="#tootModal"><i class="fa-solid fa-plus"></i></button>
+            {% else %}
+            <a class="btn btn-primary text-light" href="{% url 'login' %}"><i class="fa-solid fa-plus"></i></a>
+            {% endif %}
+        </div>
+        <div class="bottom-navbar bg-dark">
+            <div class="container">
+                <ul class="nav justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href=""><i class="fa-solid fa-house"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href=""><i class="fa-solid fa-user"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href=""><i class="fa-solid fa-magnifying-glass"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- モーダルの追加 -->
+    <div class="modal fade" id="tootModal" tabindex="-1" aria-labelledby="tootModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tootModalLabel">toot</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'toot_new' %}">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <div class="text-end">{% bootstrap_button button_type='submit' content='トゥトゥる' %}</div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</nav>
-<main>
-    <div class="container">
-        {% block main %}{% endblock %}
-    </div>
-</main>
 </body>
+
 </html>

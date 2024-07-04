@@ -1,28 +1,43 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import render,get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-from .models import CustomUser, Toot, Follow, Reply, Like, Retoot
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
+from main.forms import TootForm
 
 # 既存のビュー
 def top(request):
-    return render(request, 'toot/top.html')
+    toots = Toot.objects.all()
+    context = {'toots': toots}
+    return render(request, 'toot/top.html',context)
 
 # 新しいクラスベースのビュー
 class TopView(ListView):
     model = Toot
+    usrmodel = CustomUser
     template_name = 'toot/top.html'
     context_object_name = 'toots'
     ordering = ['-created_at']
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = TootForm()
+        return context
 
 class TootCreateView(CreateView):
     model = Toot
+    form_class = TootForm
     template_name = 'toot/toot_new.html'
-    fields = ['content']
+    success_url = reverse_lazy('top')
 
     def form_valid(self, form):
-        form.instance.user = self.request.user.customuser
+        try:
+            form.instance.user = self.request.user.customuser
+        except CustomUser.DoesNotExist:
+            # Handle the case where CustomUser does not exist by creating it
+            custom_user = CustomUser.objects.create(user=self.request.user)
+            form.instance.user = custom_user
         return super().form_valid(form)
-
 class TootDetailView(DetailView):
     model = Toot
     template_name = 'toot/toot_detail.html'
