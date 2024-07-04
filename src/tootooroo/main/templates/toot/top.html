@@ -7,7 +7,7 @@
     <div class="card-body">
         <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
             <div class="d-flex align-items-center">
-                <img src="../../static/media/icon.png" alt="Default Image" height="50">
+                <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
                 <div class="mx-2">
                     <h5 class="mb-0">{{ toot.user }}</h5>
                     <small class="text-muted">{{ toot.created_at }}</small>

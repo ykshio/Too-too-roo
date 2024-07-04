@@ -56,9 +56,15 @@ class TootUpdateView(UpdateView):
     fields = ['content']
 
 class UserDetailView(DetailView):
-    model = CustomUser
-    template_name = 'toot/user_detail.html'
-    context_object_name = 'user_detail'
+    model = Toot
+    template_name = 'toot/toot_detail.html'
+    context_object_name = 'toot'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['liked_toots'] = self.request.user.customuser.likes.values_list('toot_id', flat=True)
+        return context
 
 class UserUpdateView(UpdateView):
     model = CustomUser
