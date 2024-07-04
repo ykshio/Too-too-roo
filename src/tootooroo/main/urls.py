@@ -1,5 +1,8 @@
 from django.urls import path
 from main import views
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import CreateView
 
 urlpatterns = [
     path('', views.TopView.as_view(), name='top'),
@@ -15,6 +18,9 @@ urlpatterns = [
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
     path('toot/<int:pk>/like/', views.LikeTootView.as_view(), name='like_toot'),
     path('toot/<int:pk>/retoot/', views.RetootCreateView.as_view(), name='retoot'),
+    path('login/', LoginView.as_view(redirect_authenticated_user=True, template_name='toot/login.html'), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/'), name='signup'),
 ]
 
 
