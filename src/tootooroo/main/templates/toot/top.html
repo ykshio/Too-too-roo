@@ -1,4 +1,5 @@
 {% extends 'toot/base.html' %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% block main %}
 {% if toots %}
@@ -32,4 +33,32 @@
 {% else %}
 <p>投稿はありません</p>
 {% endif %}
+
 {% endblock %}
+{% block footer %}
+<div class="fixed-bottom text-end pe-3 pb-5">
+    {% if user.is_authenticated %}
+    <button class="btn btn-primary text-light" data-bs-toggle="modal" data-bs-target="#tootModal"><i class="fa-solid fa-plus"></i></button>
+    {% else %}
+    <a class="btn btn-primary text-light" href="{% url 'login' %}"><i class="fa-solid fa-plus"></i></a>
+    {% endif %}
+</div>
+{% endblock %}
+<!-- モーダルの追加 -->
+<div class="modal fade" id="tootModal" tabindex="-1" aria-labelledby="tootModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tootModalLabel">toot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'toot_new' %}">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <div class="text-end">{% bootstrap_button button_type='submit' content='トゥトゥる' %}</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

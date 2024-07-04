@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 <html>
 
-<head>
+<head class="fixed-top">
     <meta charset="UTF-8">
     <title>トゥットゥルー♪</title>
     <link rel="icon" href="{% static 'media/icon_white.ico' %}" type="image/x-icon">
@@ -36,13 +36,7 @@
         </div>
     </main>
     <footer class="fixed-bottom">
-        <div class="text-end pe-3 pb-3">
-            {% if user.is_authenticated %}
-            <button class="btn btn-primary text-light" data-bs-toggle="modal" data-bs-target="#tootModal"><i class="fa-solid fa-plus"></i></button>
-            {% else %}
-            <a class="btn btn-primary text-light" href="{% url 'login' %}"><i class="fa-solid fa-plus"></i></a>
-            {% endif %}
-        </div>
+        {% block footer %}{% endblock %}
         <div class="bottom-navbar bg-dark">
             <div class="container">
                 <ul class="nav justify-content-center">
@@ -60,24 +54,5 @@
         </div>
     </footer>
 
-    <!-- モーダルの追加 -->
-    <div class="modal fade" id="tootModal" tabindex="-1" aria-labelledby="tootModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="tootModalLabel">toot</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'toot_new' %}">
-                        {% csrf_token %}
-
-                        <div class="text-end">{% bootstrap_button button_type='submit' content='トゥトゥる' %}</div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
 
 </html>
