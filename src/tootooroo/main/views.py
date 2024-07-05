@@ -86,20 +86,39 @@ class TootUpdateView(UpdateView):
     template_name = 'toot/toot_edit.html'
     fields = ['content']
 
+
+from django.shortcuts import get_object_or_404
+from django.views.generic import DetailView
+from .models import CustomUser, Toot, Like
+
 class UserDetailView(DetailView):
-    model = get_user_model()
+    model = CustomUser
     template_name = 'toot/user_detail.html'
     context_object_name = 'user_profile'
 
+    def get_object(self):
+        return get_object_or_404(CustomUser, pk=self.kwargs['pk'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.get_object()
-        context['toots'] = Toot.objects.filter(user=user).order_by('-created_at')
-        context['following_count'] = user.following.count()
-        context['followers_count'] = user.followers.count()
+        user_profile = self.get_object()
+        
+        # ログインユーザーがいいねした投稿の一覧を取得する
         if self.request.user.is_authenticated:
-            context['liked_toots'] = self.request.user.customuser.likes.values_list('toot_id', flat=True)
+            liked_toots = Like.objects.filter(user=self.request.user.customuser).values_list('toot_id', flat=True)
+            context['liked_toots'] = liked_toots
+            context['is_following'] = self.request.user.customuser.following.filter(pk=user_profile.pk).exists()
+        else:
+            context['liked_toots'] = []
+            context['is_following'] = False
+        
+        # その他のコンテキストデータの取得
+        context['toots'] = Toot.objects.filter(user=user_profile).order_by('-created_at')
+        context['following_count'] = user_profile.following.count()
+        context['followers_count'] = user_profile.followers.count()
+
         return context
+
 
 class UserUpdateView(UpdateView):
     model = CustomUser

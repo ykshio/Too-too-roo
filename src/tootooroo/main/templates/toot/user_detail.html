@@ -9,10 +9,26 @@
             <div class="card">
                 <img src="{% static 'media/icon.png' %}" class="card-img-top" alt="{{ user_profile.username }}">
                 <div class="card-body">
-                    <h5 class="card-title">{{ user_profile.username }}</h5>
+                    <h5 class="card-title">{{ user_profile.user.username }}</h5>
                     <p class="card-text">{{ user_profile.bio }}</p>
-                    <p class="card-text"><small class="text-muted">Joined: {{ user_profile.date_joined }}</small></p>
-                    <a href="#" class="btn btn-primary">Follow</a>
+                    <p class="card-text"><small class="text-muted">Joined: {{ user_profile.user.date_joined }}</small></p>
+                    {% if user.is_authenticated %}
+                        {% if user == user_profile %}
+                            <!-- Buttons for the user's own profile -->
+                            <a href="{% url 'user_edit' pk=user.id %}" class="btn btn-primary">プロフィールを編集</a>
+                            <form id="logout-form" method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">ログアウト</button>
+                            </form>
+                        {% else %}
+                            <!-- Button to follow/unfollow the user -->
+                            {% if is_following %}
+                                <a href="{% url 'user_unfollow' pk=user_profile.pk %}" class="btn btn-secondary">フォロー解除</a>
+                            {% else %}
+                                <a href="{% url 'user_follow' pk=user_profile.pk %}" class="btn btn-primary">フォローする</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
