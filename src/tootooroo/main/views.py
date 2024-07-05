@@ -73,6 +73,12 @@ class TootDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = TootForm()
+        if self.request.user.is_authenticated:
+            user = self.request.user.customuser
+            liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
+            context['liked_toots'] = liked_toots
+        else:
+            context['liked_toots'] = []
         return context
 
 class TootUpdateView(UpdateView):
@@ -149,8 +155,8 @@ class LikeTootView(LoginRequiredMixin, RedirectView):
             toot.likes.filter(user=user).delete()
             toot.like_count -= 1
         toot.save()
-        # リファラーを使用しない場合はここでリダイレクト先のURLを返す
-        return self.request.META.get('HTTP_REFERER', '/')
+        referer_url = self.request.META.get('HTTP_REFERER', '/')
+        return f"{referer_url}#toot-{toot.id}"
 
 class RetootCreateView(RedirectView):
     pattern_name = 'toot_detail'

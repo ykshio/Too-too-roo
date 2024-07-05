@@ -7,7 +7,7 @@
 {% if toots %}
 <div class="pb-5">
     {% for toot in toots %}
-    <div class="card my-3 mb-5">
+    <div class="card my-3 mb-5" id="toot-{{ toot.id }}">
         <div class="card-body">
             <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
                 <div class="d-flex align-items-center">
