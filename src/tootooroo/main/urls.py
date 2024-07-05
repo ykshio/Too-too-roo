@@ -5,7 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import CreateView
 
 urlpatterns = [
-    path('', views.TopView.as_view(), name='top'),
+    path('', views.root_view, name='root'),
+    path('top/', views.TopView.as_view(), name='top'),
     path('toot/new/', views.TootCreateView.as_view(), name='toot_new'),
     path('toot/<int:pk>/', views.TootDetailView.as_view(), name='toot_detail'),
     path('toot/<int:pk>/edit/', views.TootUpdateView.as_view(), name='toot_edit'),

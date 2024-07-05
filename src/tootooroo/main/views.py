@@ -3,14 +3,31 @@ from django.shortcuts import render,get_object_or_404, redirect
 from django.urls import reverse_lazy
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
 from main.forms import TootForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
+
+
+
+def root_view(request):
+    if request.user.is_authenticated:
+        return redirect('top')
+    else:
+        return redirect('login')
+    
+
+@login_required
+def top_view(request):
+    return redirect('top')
+
 
 # 既存のビュー
-def top(request):
-    toots = Toot.objects.all()
-    context = {'toots': toots}
-    return render(request, 'toot/top.html',context)
+# def top(request):
+#     toots = Toot.objects.all()
+#     context = {'toots': toots}
+#     return render(request, 'toot/top.html',context)
 
 # 新しいクラスベースのビュー
 class TopView(ListView):
@@ -19,6 +36,7 @@ class TopView(ListView):
     template_name = 'toot/top.html'
     context_object_name = 'toots'
     ordering = ['-created_at']
+    login_url = '/login/'
     
 
     def get_context_data(self, **kwargs):
@@ -46,9 +64,16 @@ class TootCreateView(CreateView):
             custom_user = CustomUser.objects.create(user=self.request.user)
             form.instance.user = custom_user
         return super().form_valid(form)
-class TootDetailView(DetailView):
+class TootDetailView(LoginRequiredMixin, DetailView):
     model = Toot
     template_name = 'toot/toot_detail.html'
+    context_object_name = 'toot'
+    login_url = '/login/'  # ログインページのURL
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = TootForm()
+        return context
 
 class TootUpdateView(UpdateView):
     model = Toot
@@ -56,12 +81,16 @@ class TootUpdateView(UpdateView):
     fields = ['content']
 
 class UserDetailView(DetailView):
-    model = Toot
-    template_name = 'toot/toot_detail.html'
-    context_object_name = 'toot'
+    model = get_user_model()
+    template_name = 'toot/user_detail.html'
+    context_object_name = 'user_profile'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        context['toots'] = Toot.objects.filter(user=user).order_by('-created_at')
+        context['following_count'] = user.following.count()
+        context['followers_count'] = user.followers.count()
         if self.request.user.is_authenticated:
             context['liked_toots'] = self.request.user.customuser.likes.values_list('toot_id', flat=True)
         return context
@@ -120,6 +149,7 @@ class LikeTootView(LoginRequiredMixin, RedirectView):
             toot.likes.filter(user=user).delete()
             toot.like_count -= 1
         toot.save()
+        # リファラーを使用しない場合はここでリダイレクト先のURLを返す
         return self.request.META.get('HTTP_REFERER', '/')
 
 class RetootCreateView(RedirectView):
