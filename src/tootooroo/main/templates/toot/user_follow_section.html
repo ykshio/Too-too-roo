@@ -1,0 +1,34 @@
+<!-- toot/user_follow_section.html -->
+<div>
+    フォロワー: <span id="followers-count">{{ followers_count }}</span>
+</div>
+<div>
+    フォロー中: <span id="following-count">{{ following_count }}</span>
+</div>
+
+{% if is_following %}
+    <a href="{% url 'user_unfollow' pk=user_profile.pk %}" class="btn btn-secondary follow-btn">フォロー解除</a>
+{% else %}
+    <a href="{% url 'user_follow' pk=user_profile.pk %}" class="btn btn-primary follow-btn">フォローする</a>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(document).on('click', '.follow-btn', function(event) {
+            event.preventDefault();
+            var $button = $(this);
+            var url = $button.attr('href');
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(data) {
+                    $('#follow-section').html(data);
+                },
+                error: function() {
+                    alert('フォロー操作に失敗しました。');
+                }
+            });
+        });
+    });
+</script>

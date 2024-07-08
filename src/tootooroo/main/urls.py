@@ -12,16 +12,17 @@ urlpatterns = [
     path('toot/<int:pk>/edit/', views.TootUpdateView.as_view(), name='toot_edit'),
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
     path('user/<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_edit'),
-    path('user/<int:pk>/follow/', views.UserFollowView.as_view(), name='user_follow'),
+    # path('user/<int:pk>/follow/', views.UserFollowView.as_view(), name='user_follow'),
     path('user/<int:pk>/followers/', views.UserFollowersView.as_view(), name='user_followers'),
     path('user/<int:pk>/following/', views.UserFollowingView.as_view(), name='user_following'),
+    path('user/<int:pk>/unfollow/', views.user_unfollow, name='user_unfollow'),
+    path('user/<int:pk>/follow/', views.user_follow, name='user_follow'),
     path('user/<int:pk>/toots/', views.UserTootsView.as_view(), name='user_toots'),
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
     path('toot/<int:pk>/like/', views.LikeTootView.as_view(), name='like_toot'),
     path('toot/<int:pk>/retoot/', views.RetootCreateView.as_view(), name='retoot'),
     path('login/', LoginView.as_view(redirect_authenticated_user=True, template_name='toot/login.html',next_page='top'), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
-    path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/'), name='signup'),
+    path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/',), name='signup'),
 ]
-
 

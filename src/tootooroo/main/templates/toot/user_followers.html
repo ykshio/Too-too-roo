@@ -1,0 +1,29 @@
+{% load static %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Followers of {{ user_profile.user.username }}</h2>
+            {% if followers %}
+            <ul class="list-group list-group-flush">
+                {% for follower in followers %}
+                <li class="list-group-item d-flex align-items-center">
+                    <div class="me-3">
+                        {% if follower.follower.profile_image %}
+                        <img src="{{ follower.follower.profile_image.url }}" alt="User Image" height="50">
+                        {% else %}
+                        <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <a href="{% url 'user_profile' follower.follower.pk %}">{{ follower.follower.username }}</a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No followers.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

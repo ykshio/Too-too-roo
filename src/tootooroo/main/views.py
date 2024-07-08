@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from .forms import ProfileEditForm
-
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from .models import CustomUser, Toot, Like
@@ -114,8 +114,8 @@ class UserDetailView(DetailView):
         
         # ログインユーザーがいいねした投稿の一覧を取得する
         if self.request.user.is_authenticated:
-            liked_toots = Like.objects.filter(user=self.request.user.customuser).values_list('toot_id', flat=True)
-            context['liked_toots'] = liked_toots
+            liked_toots = Like.objects.filter(user=user_profile).values_list('toot_id', flat=True)
+            context['liked_toots'] = Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
             context['is_following'] = self.request.user.customuser.following.filter(pk=user_profile.pk).exists()
         else:
             context['liked_toots'] = []
@@ -169,15 +169,50 @@ class UserFollowView(RedirectView):
         Follow.objects.get_or_create(follower=follower, following=following)
         return super().get_redirect_url(*args, **kwargs)
 
+@login_required
+def user_follow(request, pk):
+    user_to_follow = get_object_or_404(CustomUser, pk=pk)
+    if request.user.is_authenticated:
+        follower = request.user.customuser
+        Follow.objects.get_or_create(follower=follower, following=user_to_follow)
+    return redirect('user_detail', pk=pk)
+
+@login_required
+def user_unfollow(request, pk):
+    user_to_unfollow = get_object_or_404(CustomUser, pk=pk)
+    if request.user.is_authenticated:
+        follower = request.user.customuser
+        Follow.objects.filter(follower=follower, following=user_to_unfollow).delete()
+    return redirect('user_detail', pk=pk)
+
+
+
+
 class UserFollowersView(DetailView):
     model = CustomUser
     template_name = 'toot/user_followers.html'
-    context_object_name = 'user_detail'
+    context_object_name = 'user_profile'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_profile = self.get_object()
+        followers = Follow.objects.filter(following=user_profile)
+        context['followers'] = followers
+        return context
 
 class UserFollowingView(DetailView):
     model = CustomUser
     template_name = 'toot/user_following.html'
-    context_object_name = 'user_detail'
+    context_object_name = 'user_profile'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_profile = self.get_object()
+        following = user_profile.following.all()  # user_profile がフォローしているユーザーのリストを取得する
+        context['following'] = following
+        return context
+
+    
 
 class UserTootsView(ListView):
     model = Toot

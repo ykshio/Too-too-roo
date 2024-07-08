@@ -106,6 +106,53 @@
             </div>
         </div>
     </div>
+    <!-- base.html の最後に追加 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.follow-btn').forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const form = this.closest('form');
+                const url = form.getAttribute('action');
+                const formData = new FormData(form);
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',  // Django の Ajax CSRF 対策用
+                        'X-CSRFToken': '{{ csrf_token }}'     // CSRF トークンのセット
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const followersCountElement = document.getElementById('followers-count');
+                    const followingCountElement = document.getElementById('following-count');
+
+                    if (form.id === 'follow-form') {
+                        button.textContent = 'フォロー解除';
+                        button.classList.remove('btn-primary');
+                        button.classList.add('btn-secondary');
+                        form.setAttribute('action', url.replace('follow', 'unfollow'));
+                        followersCountElement.textContent = data.followers_count;
+                        followingCountElement.textContent = data.following_count;
+                    } else if (form.id === 'unfollow-form') {
+                        button.textContent = 'フォローする';
+                        button.classList.remove('btn-secondary');
+                        button.classList.add('btn-primary');
+                        form.setAttribute('action', url.replace('unfollow', 'follow'));
+                        followersCountElement.textContent = data.followers_count;
+                        followingCountElement.textContent = data.following_count;
+                    }
+                })
+                .catch(error => {
+                    console.error('フォロー操作に失敗しました。', error);
+                    alert('フォロー操作に失敗しました。');
+                });
+            });
+        });
+    });
+</script>
 
 
 
