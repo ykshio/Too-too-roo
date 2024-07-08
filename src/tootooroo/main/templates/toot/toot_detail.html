@@ -6,7 +6,11 @@
     <div class="card-body">
         <a class="nav-link text-dark fs-3" href="{% url 'user_detail' toot.user.id %}">
             <div class="d-flex align-items-center">
+                {% if toot.user.profile_image %}
+                <img src="{{ toot.user.profile_image.url }}" alt="User Image" height="50">
+                {% else %}
                 <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
+                {% endif %}
                 <div class="mx-2">
                     <h5 class="mb-0">{{ toot.user }}</h5>
                     <small class="text-muted">{{ toot.created_at }}</small>

@@ -1,0 +1,14 @@
+{% extends 'toot/base.html' %}
+
+{% block main %}
+  <h2>プロフィール編集</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">保存</button>
+  </form>
+  <!-- デバッグ用情報の表示 -->
+  <pre>{{ form.errors }}</pre>
+  <pre>{{ form.non_field_errors }}</pre>
+  <pre>{{ form.media }}</pre>
+{% endblock %}

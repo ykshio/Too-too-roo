@@ -4,7 +4,7 @@ from django.db import models
 class CustomUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(upload_to='main/static/media/profile_images/', blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     created_at = models.DateTimeField('アカウント作成日', auto_now_add=True)
     updated_at = models.DateTimeField('アカウント更新日', auto_now=True)
 
