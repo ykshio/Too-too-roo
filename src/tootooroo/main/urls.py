@@ -1,8 +1,9 @@
-from django.urls import path
+from django.urls import path,re_path
 from main import views
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import CreateView
+from .views import HashtagDetailView
 
 urlpatterns = [
     path('', views.root_view, name='root'),
@@ -30,4 +31,7 @@ urlpatterns = [
     path('search/', views.search, name='search'), 
     path('reply/<int:pk>/delete/', views.delete_reply, name='delete_reply'),
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
+    # re_path(r'^hashtag/(?P<slug>[-\w]+)/$', views.HashtagDetailView.as_view(), name='hashtag_detail'),
+    path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
+
 ]

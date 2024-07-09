@@ -12,7 +12,7 @@ from .forms import ProfileEditForm
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
-from .models import CustomUser, Toot, Like
+from .models import CustomUser, Toot, Like,Hashtag
 from django.views.generic.base import View
 from django.views.decorators.http import require_POST
 from django.db.models import Q
@@ -67,6 +67,8 @@ class TopView(ListView):
 
         return context
 
+# 変更点のある箇所のみ示します
+
 class TootCreateView(CreateView):
     model = Toot
     form_class = TootForm
@@ -80,7 +82,9 @@ class TootCreateView(CreateView):
             # Handle the case where CustomUser does not exist by creating it
             custom_user = CustomUser.objects.create(user=self.request.user)
             form.instance.user = custom_user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        form.instance.save()
+        return response
 
 
 class TootDetailView(LoginRequiredMixin, DetailView):
@@ -350,3 +354,25 @@ class ReplyCreateView(CreateView):
 
     def get_success_url(self):
         return reverse_lazy('toot_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+from django.shortcuts import get_object_or_404
+from django.views.generic import DetailView
+from .models import Hashtag, Toot
+
+class HashtagDetailView(DetailView):
+    model = Hashtag
+    template_name = 'toot/hashtag_detail.html'
+    context_object_name = 'hashtag'
+
+    def get_object(self, queryset=None):
+        queryset = Hashtag.objects.all()
+        hashtag_id = self.kwargs.get('id')
+        hashtag = get_object_or_404(queryset, id=hashtag_id)
+        return hashtag
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hashtag = self.object
+        context['toots'] = Toot.objects.filter(hashtags__id=hashtag.id)
+        return context

@@ -20,6 +20,11 @@
         </a>
         <div class="mt-3">
             <p class="mb-0">{{ toot.content |linebreaksbr|urlize }}</p>
+            <div class="mt-2">
+                {% for hashtag in toot.hashtags.all %}
+                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name }}</a>
+                {% endfor %}
+            </div>
         </div>
         <div class="mt-3">
             <form action="{% url 'like_toot' toot.id %}" method="post" class="d-inline">
@@ -36,7 +41,8 @@
                 <i class="fa-regular fa-comment"></i> <span>リプライ({{ toot.reply_count }})</span>
             </button>
             {% if request.user == toot.user.user %}
-            <form action="{% url 'delete_toot' toot.id %}" method="post" class="d-inline" onsubmit="return confirmDelete();">
+            <form action="{% url 'delete_toot' toot.id %}" method="post" class="d-inline"
+                onsubmit="return confirmDelete();">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-link p-0 text-danger">
                     <i class="fa-solid fa-trash"></i> 削除
@@ -50,7 +56,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         {% if reply.user.profile_image %}
-                        <img src="{{ reply.user.profile_image.url }}" alt="User Image" height="40" class="rounded-circle">
+                        <img src="{{ reply.user.profile_image.url }}" alt="User Image" height="40"
+                            class="rounded-circle">
                         {% else %}
                         <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
                         {% endif %}
@@ -64,7 +71,8 @@
                     </div>
                     {% if request.user == reply.user.user %}
                     <div class="mt-2">
-                        <form action="{% url 'delete_reply' reply.id %}" method="post" onsubmit="return confirmDelete();">
+                        <form action="{% url 'delete_reply' reply.id %}" method="post"
+                            onsubmit="return confirmDelete();">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-link p-0 text-danger">
                                 <i class="fa-solid fa-trash"></i> 削除

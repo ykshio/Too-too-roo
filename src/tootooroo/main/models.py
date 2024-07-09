@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.db import models
+import re
+from django.utils.text import slugify
+from unidecode import unidecode
 
 class CustomUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -11,6 +14,29 @@ class CustomUser(models.Model):
     def __str__(self):
         return self.user.username
 
+class Hashtag(models.Model):
+    name = models.CharField('ハッシュタグ', max_length=255, unique=True)
+    slug = models.SlugField('スラッグ', default='', editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            cleaned_name = unidecode(self.name)
+            base_slug = slugify(cleaned_name.lower())
+
+            slug = base_slug
+            num = 1
+            while Hashtag.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            
+            self.slug = slug
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
 class Toot(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='toots', verbose_name='投稿者')
     content = models.CharField('内容', max_length=280)
@@ -18,6 +44,7 @@ class Toot(models.Model):
     updated_at = models.DateTimeField('更新日', auto_now=True)
     original_toot = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='original_toot_retoots', verbose_name='元のトゥート')
     like_count = models.PositiveIntegerField(default=0)
+    hashtags = models.ManyToManyField(Hashtag, blank=True, related_name='toots')
 
     def __str__(self):
         return self.content
@@ -25,6 +52,17 @@ class Toot(models.Model):
     @property
     def reply_count(self):
         return self.replies.count()
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_hashtags()
+
+    def _update_hashtags(self):
+        hashtags = re.findall(r'#(\w+)', self.content)
+        self.hashtags.clear()
+        for tag in hashtags:
+            hashtag, created = Hashtag.objects.get_or_create(name=tag)
+            self.hashtags.add(hashtag)
 
 class Follow(models.Model):
     follower = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='following', verbose_name='フォロワー')

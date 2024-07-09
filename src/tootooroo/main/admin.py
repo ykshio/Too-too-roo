@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('user', 'bio', 'created_at', 'updated_at')
@@ -35,4 +35,4 @@ admin.site.register(Follow, FollowAdmin)
 admin.site.register(Reply, ReplyAdmin)
 admin.site.register(Like, LikeAdmin)
 admin.site.register(Retoot, RetootAdmin)
-
+admin.site.register(Hashtag)
