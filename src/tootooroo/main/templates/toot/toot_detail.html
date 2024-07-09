@@ -99,30 +99,30 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="card">
+                {% for like in liked_by_users %}
+                <div class="card my-3">
                     <div class="card-body">
-                        {% for like in liked_by_users %}
-                        <div class="card my-3">
-                            <div class="card-body">
-                                <a href="{% url 'user_detail' like.user.id %}" class="text-decoration-none text-dark">
-                                    <div class="d-flex align-items-center mb-2">
-                                        {% if like.user.profile_image %}
-                                        <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40">
-                                        {% else %}
-                                        <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
-                                        {% endif %}
-                                        <div class="mx-2">
-                                            <h6 class="mb-0">{{ like.user }}</h6>
-                                        </div>
-                                    </div>
-                                </a>
+                        <a href="{% url 'user_detail' like.user.id %}" class="text-decoration-none text-dark">
+                            <div class="d-flex align-items-center mb-2">
+                                {% if like.user.profile_image %}
+                                <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40" class="rounded-circle">
+                                {% else %}
+                                <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                                {% endif %}
+                                <div class="mx-2">
+                                    <h6 class="mb-0">{{ like.user }}</h6>
+                                    
+                                </div>
+                                <div class="m-auto">
+                                    <span class="text-muted small">いいねした日時: {{ like.created_at }}</span>
+                                </div>
                             </div>
-                        </div>
-                        {% empty %}
-                        <p>まだ誰もいいねしていません。</p>
-                        {% endfor %}
+                        </a>
                     </div>
                 </div>
+                {% empty %}
+                <p>まだ誰もいいねしていません。</p>
+                {% endfor %}
             </div>
         </div>
     </div>
