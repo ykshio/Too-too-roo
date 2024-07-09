@@ -26,14 +26,14 @@
                 {% csrf_token %}
                 <button type="submit" class="btn btn-link p-0" style="color:rgb(247, 124, 210);">
                     <i class="fa{% if toot.id in liked_toots %}-solid{% else %}-regular{% endif %} fa-heart"></i>
-                    <span>{{ toot.like_count }}</span>
+                    <span>いいね({{ toot.like_count }})</span>
                 </button>
             </form>
             <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#likesModal">
                 <i class="fas fa-users"></i> いいねしたユーザー
             </button>
             <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#replyModal">
-                <i class="fas fa-reply"></i> リプライ
+                <i class="fa-regular fa-comment"></i> <span>リプライ({{ toot.reply_count }})</span>
             </button>
             {% if request.user == toot.user.user %}
             <form action="{% url 'delete_toot' toot.id %}" method="post" class="d-inline" onsubmit="return confirmDelete();">

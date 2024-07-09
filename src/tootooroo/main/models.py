@@ -21,6 +21,10 @@ class Toot(models.Model):
 
     def __str__(self):
         return self.content
+    
+    @property
+    def reply_count(self):
+        return self.replies.count()
 
 class Follow(models.Model):
     follower = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='following', verbose_name='フォロワー')
