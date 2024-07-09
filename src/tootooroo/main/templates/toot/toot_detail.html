@@ -22,7 +22,8 @@
             <p class="mb-0">{{ toot.content |linebreaksbr|urlize }}</p>
             <div class="mt-2">
                 {% for hashtag in toot.hashtags.all %}
-                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name }}</a>
+                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name
+                    }}</a>
                 {% endfor %}
             </div>
         </div>
@@ -34,8 +35,9 @@
                     <span>いいね({{ toot.like_count }})</span>
                 </button>
             </form>
-            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#likesModal">
-                <i class="fas fa-users"></i> いいねしたユーザー
+            <!-- モーダルを使わずにリストを表示するボタン -->
+            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#likedByUsersModal">
+                <i class="fa-solid fa-users"></i> <span>いいねしたユーザー</span>
             </button>
             <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#replyModal">
                 <i class="fa-regular fa-comment"></i> <span>リプライ({{ toot.reply_count }})</span>
@@ -87,26 +89,40 @@
     </div>
 </div>
 
-<div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<!-- いいねしたユーザーのリストをモーダルで表示 -->
+<div class="modal fade" id="likedByUsersModal" tabindex="-1" aria-labelledby="likedByUsersModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="likesModalLabel">Liked by</h5>
+                <h5 class="modal-title" id="likedByUsersModalLabel">いいねしたユーザー</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                {% for like in likes %}
-                <div class="d-flex align-items-center mb-2">
-                    {% if like.user.profile_image %}
-                    <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40">
-                    {% else %}
-                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
-                    {% endif %}
-                    <div class="mx-2">
-                        <h6 class="mb-0">{{ like.user.username }}</h6>
+                <div class="card">
+                    <div class="card-body">
+                        {% for like in liked_by_users %}
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <a href="{% url 'user_detail' like.user.id %}" class="text-decoration-none text-dark">
+                                    <div class="d-flex align-items-center mb-2">
+                                        {% if like.user.profile_image %}
+                                        <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40">
+                                        {% else %}
+                                        <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                                        {% endif %}
+                                        <div class="mx-2">
+                                            <h6 class="mb-0">{{ like.user }}</h6>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>まだ誰もいいねしていません。</p>
+                        {% endfor %}
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div>

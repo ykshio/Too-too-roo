@@ -4,41 +4,7 @@
 {% if toots %}
 <div class="pb-5 mb-5 my-5">
     {% for toot in toots %}
-    <div class="card my-3" id="toot-{{ toot.id }}">
-        <div class="card-body">
-            <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
-                <div class="d-flex align-items-center">
-                    {% if toot.user.profile_image %}
-                    <img src="{{ toot.user.profile_image.url }}" alt="User Image" height="50" class="rounded-circle">
-                    {% else %}
-                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
-                    {% endif %}
-                    <div class="mx-2">
-                        <h5 class="mb-0">{{ toot.user }}</h5>
-                        <small class="text-muted">{{ toot.created_at }}</small>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <p class="mb-0">{{ toot.content|linebreaksbr|urlize }}</p>
-                    <div class="mt-2">
-                        {% for hashtag in toot.hashtags.all %}
-                        <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </a>
-            <div class="mt-3">
-                <form action="{% url 'like_toot' toot.id %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-link p-0" style="color:rgb(247, 124, 210);">
-                        <i class="fa{% if toot.id in liked_toots %}-solid{% else %}-regular{% endif %} fa-heart"></i>
-                        <span>{{ toot.like_count }}</span>
-                    </button>
-                </form>
-                <span class="ms-3"><i class="fa-regular fa-comment"></i> <span>{{ toot.reply_count }}</span></span>
-            </div>
-        </div>
-    </div>
+    {% include 'toot/toot_card.html' with toots=toots liked_toots=liked_toots %}
     {% endfor %}
 </div>
 {% else %}

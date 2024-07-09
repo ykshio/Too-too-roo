@@ -3,6 +3,7 @@ from django.db import models
 import re
 from django.utils.text import slugify
 from unidecode import unidecode
+from django.db.models import UniqueConstraint
 
 class CustomUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -12,7 +13,7 @@ class CustomUser(models.Model):
     updated_at = models.DateTimeField('アカウント更新日', auto_now=True)
 
     def __str__(self):
-        return self.user.username
+        return self.user.get_username()
 
 class Hashtag(models.Model):
     name = models.CharField('ハッシュタグ', max_length=255, unique=True)
@@ -35,7 +36,6 @@ class Hashtag(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Toot(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='toots', verbose_name='投稿者')
@@ -70,7 +70,9 @@ class Follow(models.Model):
     created_at = models.DateTimeField('フォロー日', auto_now_add=True)
 
     class Meta:
-        unique_together = ('follower', 'following')
+        constraints = [
+            UniqueConstraint(fields=['follower', 'following'], name='unique_follow')
+        ]
 
 class Reply(models.Model):
     toot = models.ForeignKey(Toot, on_delete=models.CASCADE, related_name='replies', verbose_name='トゥート')
@@ -88,7 +90,9 @@ class Like(models.Model):
     created_at = models.DateTimeField('いいね日', auto_now_add=True)
 
     class Meta:
-        unique_together = ('toot', 'user')
+        constraints = [
+            UniqueConstraint(fields=['toot', 'user'], name='unique_like')
+        ]
 
 class Retoot(models.Model):
     toot = models.ForeignKey(Toot, on_delete=models.CASCADE, related_name='retoot_retoots', verbose_name='トゥート')
@@ -96,5 +100,6 @@ class Retoot(models.Model):
     created_at = models.DateTimeField('リトゥート日', auto_now_add=True)
 
     class Meta:
-        unique_together = ('toot', 'user')
-
+        constraints = [
+            UniqueConstraint(fields=['toot', 'user'], name='unique_retoot')
+        ]

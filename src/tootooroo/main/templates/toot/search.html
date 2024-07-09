@@ -10,7 +10,9 @@
             <input type="text" class="form-control" placeholder="Toots" aria-label="Search Toots" name="q">
             <button class="btn btn-outline-primary" type="submit"><i
                     class="fa-solid fa-magnifying-glass"></i>検索</button>
+                    
         </div>
+        
     </form>
 
 
@@ -19,7 +21,7 @@
         <div class="col-md-8 offset-md-2">
             <div class="pb-5 mb-5 my-5">
                 {% for toot in toots %}
-                <div class="card my-3" id="toot-{{ toot.id }}">
+                <!-- <div class="card my-3" id="toot-{{ toot.id }}">
                     <div class="card-body">
                         <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
                             <div class="d-flex align-items-center">
@@ -56,7 +58,8 @@
                             <span class="ms-3"><i class="fa-regular fa-comment"></i> <span>{{ toot.reply_count }}</span></span>
                         </div>
                     </div>
-                </div>
+                </div> -->
+                {% include 'toot/toot_card.html' with toots=toots liked_toots=liked_toots %}
                 {% endfor %}
             </div>
         </div>

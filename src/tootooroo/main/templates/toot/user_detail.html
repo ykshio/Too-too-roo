@@ -2,6 +2,22 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
+{% block navbar-right %}
+<div class="d-flex justify-content-end">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            並び替え
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+            <li><a class="dropdown-item" href="?sort=newest">新しい順</a></li>
+            <li><a class="dropdown-item" href="?sort=oldest">古い順</a></li>
+            <li><a class="dropdown-item" href="?sort=most_likes">いいねが多い順</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
 {% block main %}
 <div class="container mt-4">
     <div class="row">
@@ -50,19 +66,28 @@
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active" id="toots-tab" data-bs-toggle="tab" href="#toots" role="tab"
-                        aria-controls="toots" aria-selected="false">Toots</a>
+                        aria-controls="toots" aria-selected="true">
+                        Toots ({{ toots_count }})
+                    </a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="likes-tab" data-bs-toggle="tab" href="#likes" role="tab"
-                        aria-controls="likes" aria-selected="false">Likes</a>
+                        aria-controls="likes" aria-selected="false">
+                        Likes 
+                        <!-- ({{ likes_count }}) -->
+                    </a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="followers-tab" data-bs-toggle="tab" href="#followers" role="tab"
-                        aria-controls="followers" aria-selected="false">Followers ({{ followers_count }})</a>
+                        aria-controls="followers" aria-selected="false">
+                        Followers ({{ followers_count }})
+                    </a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="following-tab" data-bs-toggle="tab" href="#following" role="tab"
-                        aria-controls="following" aria-selected="false">Following ({{ following_count }})</a>
+                        aria-controls="following" aria-selected="false">
+                        Following ({{ following_count }})
+                    </a>
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
@@ -80,8 +105,6 @@
                 </div>
             </div>
         </div>
-        
-        
     </div>
 </div>
 <script>

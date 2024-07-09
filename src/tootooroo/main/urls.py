@@ -27,11 +27,12 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/',), name='signup'),
     path('user/<int:user_id>/liked_toots/', views.UserLikedTootsView.as_view(), name='user_liked_toots'),
-    path('toot/<int:pk>/likes/', views.TootLikesView.as_view(), name='toot_likes'),
+    path('toot/<int:pk>/likess/', views.TootLikesView.as_view(), name='toot_likess'),
     path('search/', views.search, name='search'), 
     path('reply/<int:pk>/delete/', views.delete_reply, name='delete_reply'),
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
     # re_path(r'^hashtag/(?P<slug>[-\w]+)/$', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
+    path('toot/<int:toot_id>/likes/', views.toot_likes, name='toot_likes'),
 
 ]

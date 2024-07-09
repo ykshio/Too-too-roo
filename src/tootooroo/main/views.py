@@ -112,12 +112,18 @@ class TootDetailView(LoginRequiredMixin, DetailView):
         context['form'] = TootForm()
         context['reply_form'] = ReplyForm()  # ここでReplyFormを追加
         context['replies'] = Reply.objects.filter(toot=self.object)  # ここでリプライを取得
+
+        # いいねしたユーザーのリストを取得してcontextに追加
+        likes = self.object.likes.select_related('user')
+        context['liked_by_users'] = likes
+
         if self.request.user.is_authenticated:
             user = self.request.user.customuser
             liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
             context['liked_toots'] = liked_toots
         else:
             context['liked_toots'] = []
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -151,8 +157,20 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_profile = self.get_object()
-        
-        # ログインユーザーがいいねした投稿の一覧を取得する
+
+        # 並び替えオプションを取得
+        sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
+
+        if sort_option == 'oldest':
+            context['toots'] = Toot.objects.filter(user=user_profile).order_by('created_at')
+        elif sort_option == 'most_likes':
+            context['toots'] = Toot.objects.filter(user=user_profile).annotate(num_likes=Count('likes')).order_by('-num_likes', '-created_at')
+        else:
+            context['toots'] = Toot.objects.filter(user=user_profile).order_by('-created_at')
+
+        # Tootsの数を取得してcontextに追加
+        context['toots_count'] = context['toots'].count()
+
         if self.request.user.is_authenticated:
             liked_toots = Like.objects.filter(user=user_profile).values_list('toot_id', flat=True)
             context['liked_toots'] = Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
@@ -160,13 +178,19 @@ class UserDetailView(DetailView):
         else:
             context['liked_toots'] = []
             context['is_following'] = False
-        
-        # その他のコンテキストデータの取得
-        context['toots'] = Toot.objects.filter(user=user_profile).order_by('-created_at')
+
+        # Likesの数を取得してcontextに追加
+        context['likes_count'] = Like.objects.filter(toot__user=user_profile).count()
+
         context['following_count'] = user_profile.following.count()
         context['followers_count'] = user_profile.followers.count()
 
+        # いいねしたユーザーのリストを取得してcontextに追加
+        liked_by_users = Like.objects.filter(toot__user=user_profile).select_related('user')
+        context['liked_by_users'] = liked_by_users
+
         return context
+
 
 
 class UserLikedTootsView(ListView):
@@ -176,16 +200,22 @@ class UserLikedTootsView(ListView):
 
     def get_queryset(self):
         user = self.request.user.customuser
-        liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
-        return Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
+        sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
+
+        if sort_option == 'oldest':
+            liked_toots = Toot.objects.none()  # 空のクエリセットを返す
+        else:
+            liked_toots = Toot.objects.filter(id__in=user.likes.values_list('toot_id', flat=True)).annotate(num_likes=Count('likes')).order_by('-likes__created_at')
+
+        return liked_toots
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user.customuser
-        liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
-        context['liked_toots'] = Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
-        context['liked_toot_ids'] = liked_toots  # 追加
-        context['user_profile'] = self.request.user.customuser
+        liked_toots = user.likes.count()  # いいねした投稿の数をカウント
+        context['liked_toot_ids'] = user.likes.values_list('toot_id', flat=True)
+        context['user_profile'] = user
+        context['toots_count'] = liked_toots  # いいねした投稿の数をテンプレートに渡す
         return context
 
 
@@ -300,11 +330,19 @@ class RetootCreateView(RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
-class TootLikesView(View):
-    def get(self, request, pk):
-        toot = get_object_or_404(Toot, pk=pk)
-        likes = Like.objects.filter(toot=toot).select_related('user__user')  # select_relatedでuserをプリフェッチ
-        return render(request, 'toot/toot_likes.html', {'toot': toot, 'likes': likes})
+class TootLikesView(ListView):
+    template_name = 'toot/toot_likes.html'
+    context_object_name = 'likes'
+
+    def get_queryset(self):
+        toot = get_object_or_404(Toot, pk=self.kwargs['pk'])
+        return Like.objects.filter(toot=toot).select_related('user__user')  # select_relatedでuserをプリフェッチ
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        toot = get_object_or_404(Toot, pk=self.kwargs['pk'])
+        context['toot'] = toot
+        return context
 
 @require_POST
 @login_required
@@ -387,3 +425,11 @@ class HashtagDetailView(DetailView):
         hashtag = self.object
         context['toots'] = Toot.objects.filter(hashtags__id=hashtag.id)
         return context
+
+from django.shortcuts import get_object_or_404, render
+from .models import Toot
+
+def toot_likes(request, toot_id):
+    toot = get_object_or_404(Toot, id=toot_id)
+    likes = toot.likes.select_related('user')
+    return render(request, 'toot/toot_likes.html', {'toot': toot, 'likes': likes})
