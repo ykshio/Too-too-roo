@@ -1,0 +1,29 @@
+{% load django_bootstrap5 %}
+{% load static %}
+
+<div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="likesModalLabel">Liked by</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% for like in likes %}
+                <div class="d-flex align-items-center mb-2">
+                    {% if like.user.profile_image %}
+                    <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40">
+                    {% else %}
+                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                    {% endif %}
+                    <div class="mx-2">
+                        <h6 class="mb-0">{{ like.user.user.username }}</h6>  <!-- 修正ポイント -->
+                    </div>
+                </div>
+                {% empty %}
+                <p>No likes found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

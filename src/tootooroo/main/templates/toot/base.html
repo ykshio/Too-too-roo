@@ -1,28 +1,43 @@
 {% load static %}
 {% load django_bootstrap5 %}
-<html>
+<html lang="ja">
 
 <head class="fixed-top">
     <meta charset="UTF-8">
     <title>トゥットゥルー♪</title>
+
     <link rel="icon" href="{% static 'media/icon_white.ico' %}" type="image/x-icon">
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <script src="https://kit.fontawesome.com/e49b9fdb64.js" crossorigin="anonymous"></script>
     {% block extraheader %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark">
+    <nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark py-0">
         <div class="container justify-content-between">
-            <a href="/" class="navbar-brand"><img src="{% static 'media/icon.svg' %}" height="30px">トゥットゥルー♪</a>
-            <ul class="navbar-nav mr-md-2">
+            <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <form id="logout-form" method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="nav-link btn btn-link" style="padding: 0;">
-                        {{ user.username }}さん　ログアウト</button>
-                </form>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button"
+                        aria-controls="offcanvasMenu">
+                        {% if user.customuser.profile_image %}
+                        <img src="{{ user.customuser.profile_image.url }}" class="rounded-circle" height="50px"
+                            alt="{{ user.username }}">
+                        {% else %}
+                        <img src="{% static 'media/icon.png' %}" class="rounded-circle" height="50px"
+                            alt="{{ user.username }}">
+                        {% endif %}
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            <a href="/" class="navbar-brand mx-auto">
+                <img src="{% static 'media/icon.svg' %}" height="30px"> トゥットゥルー♪
+            </a>
+            <ul class="navbar-nav me-md-2">
+                {% if user.is_authenticated %}
                 {% else %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">ログイン</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">会員登録</a></li>
@@ -30,21 +45,80 @@
             </ul>
         </div>
     </nav>
-    <main>
+
+    <div class="offcanvas offcanvas-start custom-offcanvas bg-dark text-light" tabindex="-1" id="offcanvasMenu"
+        aria-labelledby="offcanvasMenuLabel">
+        <div class="offcanvas-header">
+            {% if user.is_authenticated %}
+            <a class="nav-link" href="{% url 'user_detail' user.id %}">
+                
+                {% if user.customuser.profile_image %}
+                <img src="{{ user.customuser.profile_image.url }}" class="rounded-circle" height="100px"
+                    alt="{{ user.username }}">
+                {% else %}
+                <img src="{% static 'media/icon.png' %}" class="rounded-circle" height="100px"
+                    alt="{{ user.username }}">
+                {% endif %}
+                
+            </a>
+            {% endif %}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="offcanvas-body">
+            <h3>{{ user.username }}</h3>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'user_detail' user.id %}">
+                        <table class="nav-table text-light">
+                            <tr>
+                                <td><i class="fa-solid fa-user fs-1"></i></td>
+                                <td><span class="h4">プロフィール</span></td>
+                            </tr>
+                        </table>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'user_edit' user.id %}">
+                        <table class="nav-table text-light">
+                            <tr>
+                                <td><i class="fa-solid fa-pen fs-1"></i></td>
+                                <td><span class="h4">プロフィールを編集</span></td>
+                            </tr>
+                        </table>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form id="logout-form" method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link" style="background:none; border:none;">
+                            <table class="nav-table text-light">
+                                <tr>
+                                    <td><i class="fa-solid fa-right-from-bracket fs-1"></i></td>
+                                    <td><span class="h4">ログアウト</span></td>
+                                </tr>
+                            </table>
+                        </button>
+                    </form>
+                </li>
+                
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+
+
+    <main class="main">
         <div class="container">
             {% block main %}{% endblock %}
+
         </div>
     </main>
+
     <footer class="fixed-bottom">
         <!-- {% block footer %}{% endblock %} -->
-        <div class="text-end pe-3 pb-5 fs-1">
-            {% if user.is_authenticated %}
-            <button class="btn btn-primary text-light fs-3" data-bs-toggle="modal" data-bs-target="#tootModal"><i
-                    class="fa-solid fa-plus fs-1"></i></button>
-            {% else %}
-            <a class="btn btn-primary text-light" href="{% url 'login' %}"><i class="fa-solid fa-plus"></i></a>
-            {% endif %}
-        </div>
+
         <div class="bottom-navbar bg-dark py-2">
             <div class="container">
                 <ul class="nav justify-content-around">
@@ -57,17 +131,6 @@
                         {% if user.is_authenticated %}
                         <a class="nav-link text-light fs-3" href="{% url 'user_detail' user.id %}">
                             <i class="fa-solid fa-user fs-1"></i>
-                        </a>
-                        {% else %}
-                        <a class="nav-link text-light fs-3" href="">
-                            <i class="fa-solid fa-user fs-1"></i>
-                        </a>
-                        {% endif %}
-                    </li>
-                    <li class="nav-item">
-                        {% if user.is_authenticated %}
-                        <a class="nav-link text-light fs-3" href="{% url 'user_edit' user.id %}">
-                            <i class="fa-solid fa-pen fs-1"></i>
                         </a>
                         {% else %}
                         <a class="nav-link text-light fs-3" href="">
@@ -107,52 +170,73 @@
         </div>
     </div>
     <!-- base.html の最後に追加 -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.follow-btn').forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-                const form = this.closest('form');
-                const url = form.getAttribute('action');
-                const formData = new FormData(form);
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.follow-btn').forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const form = this.closest('form');
+                    const url = form.getAttribute('action');
+                    const formData = new FormData(form);
 
-                fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',  // Django の Ajax CSRF 対策用
-                        'X-CSRFToken': '{{ csrf_token }}'     // CSRF トークンのセット
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const followersCountElement = document.getElementById('followers-count');
-                    const followingCountElement = document.getElementById('following-count');
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',  // Django の Ajax CSRF 対策用
+                            'X-CSRFToken': '{{ csrf_token }}'     // CSRF トークンのセット
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const followersCountElement = document.getElementById('followers-count');
+                            const followingCountElement = document.getElementById('following-count');
 
-                    if (form.id === 'follow-form') {
-                        button.textContent = 'フォロー解除';
-                        button.classList.remove('btn-primary');
-                        button.classList.add('btn-secondary');
-                        form.setAttribute('action', url.replace('follow', 'unfollow'));
-                        followersCountElement.textContent = data.followers_count;
-                        followingCountElement.textContent = data.following_count;
-                    } else if (form.id === 'unfollow-form') {
-                        button.textContent = 'フォローする';
-                        button.classList.remove('btn-secondary');
-                        button.classList.add('btn-primary');
-                        form.setAttribute('action', url.replace('unfollow', 'follow'));
-                        followersCountElement.textContent = data.followers_count;
-                        followingCountElement.textContent = data.following_count;
-                    }
-                })
-                .catch(error => {
-                    console.error('フォロー操作に失敗しました。', error);
-                    alert('フォロー操作に失敗しました。');
+                            if (form.id === 'follow-form') {
+                                button.textContent = 'フォロー解除';
+                                button.classList.remove('btn-primary');
+                                button.classList.add('btn-secondary');
+                                form.setAttribute('action', url.replace('follow', 'unfollow'));
+                                followersCountElement.textContent = data.followers_count;
+                                followingCountElement.textContent = data.following_count;
+                            } else if (form.id === 'unfollow-form') {
+                                button.textContent = 'フォローする';
+                                button.classList.remove('btn-secondary');
+                                button.classList.add('btn-primary');
+                                form.setAttribute('action', url.replace('unfollow', 'follow'));
+                                followersCountElement.textContent = data.followers_count;
+                                followingCountElement.textContent = data.following_count;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('フォロー操作に失敗しました。', error);
+                            alert('フォロー操作に失敗しました。');
+                        });
                 });
             });
         });
-    });
-</script>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var lastScrollTop = 0;
+            var navbar = document.querySelector('.navbar');
+            navbar.style.top = '0';
+            window.addEventListener('scroll', function () {
+                var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                if (scrollTop > lastScrollTop) {
+                    // 下にスクロールしたとき
+                    navbar.style.top = '-100px'; // Adjust this value to your navbar height
+                } else {
+                    // 上にスクロールしたとき
+                    navbar.style.top = '0';
+                }
+
+                lastScrollTop = scrollTop;
+            });
+        });
+    </script>
+
 
 
 

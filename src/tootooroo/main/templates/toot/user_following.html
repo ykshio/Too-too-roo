@@ -1,29 +1,24 @@
-{% load static %}
-
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Following from {{ user_profile.user.username }}</h2>
-            {% if following %}
-            <ul class="list-group list-group-flush">
-                {% for follow in following %}
-                <li class="list-group-item d-flex align-items-center">
-                    <div class="me-3">
-                        {% if follow.following.profile_image %}
-                        <img src="{{ follow.following.profile_image.url }}" alt="User Image" height="50">
-                        {% else %}
-                        <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
-                        {% endif %}
-                    </div>
-                    <div>
-                        <a href="{% url 'user_profile' follow.following.pk %}">{{ follow.following.username }}</a>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>Not following anyone yet.</p>
-            {% endif %}
+{% for following in user_profile.following.all %}
+<div class="card my-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                {% if following.user.customuser.profile_image %}
+                <img src="{{ following.user.customuser.profile_image.url }}" alt="Profile Image" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-secondary" style="width: 50px; height: 50px;"></div>
+                {% endif %}
+                <div class="ms-3">
+                    <h5 class="card-title">{{ following.user.username }}</h5>
+                    <p class="card-text">{{ following.bio }}</p>
+                </div>
+            </div>
+            <div>
+                <a href="{% url 'user_detail' following.pk %}" class="btn btn-primary">View Profile</a>
+            </div>
         </div>
     </div>
 </div>
+{% empty %}
+<p>No followings yet.</p>
+{% endfor %}

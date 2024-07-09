@@ -24,5 +24,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(redirect_authenticated_user=True, template_name='toot/login.html',next_page='top'), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/',), name='signup'),
+    path('user/<int:user_id>/liked_toots/', views.UserLikedTootsView.as_view(), name='user_liked_toots'),
+    path('toot/<int:pk>/likes/', views.TootLikesView.as_view(), name='toot_likes'),
 ]
-

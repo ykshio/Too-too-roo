@@ -40,15 +40,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9 mb-5">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <a class="nav-link active" id="toots-tab" data-bs-toggle="tab" href="#toots" role="tab"
-                        aria-controls="toots" aria-selected="true">Toots</a>
+                        aria-controls="toots" aria-selected="false">Toots</a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="likes-tab" data-bs-toggle="tab" href="#likes" role="tab"
-                        aria-controls="likes" aria-selected="false">Likes ({{ liked_toots.count }})</a>
+                        aria-controls="likes" aria-selected="false">Likes</a>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="followers-tab" data-bs-toggle="tab" href="#followers" role="tab"
@@ -75,7 +75,24 @@
             </div>
         </div>
         
+        
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            var tabElement = document.querySelector(`a[href="${activeTab}"]`);
+            var tabInstance = new bootstrap.Tab(tabElement);
+            tabInstance.show();
+        }
 
+        var tabLinks = document.querySelectorAll('a[data-bs-toggle="tab"]');
+        tabLinks.forEach(function(tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function(event) {
+                localStorage.setItem('activeTab', event.target.getAttribute('href'));
+            });
+        });
+    });
+</script>
 {% endblock %}

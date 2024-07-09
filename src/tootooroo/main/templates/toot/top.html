@@ -5,5 +5,12 @@
 {% block main %}
 
 {% include 'toot/toot_list.html' %}
-
+<div class="text-end pe-3 fs-1 toot-button fixed-bottom">
+    {% if user.is_authenticated %}
+    <button class="btn btn-primary text-light fs-3" data-bs-toggle="modal" data-bs-target="#tootModal"><i
+            class="fa-solid fa-plus fs-1"></i></button>
+    {% else %}
+    <a class="btn btn-primary text-light" href="{% url 'login' %}"><i class="fa-solid fa-plus"></i></a>
+    {% endif %}
+</div>
 {% endblock %}

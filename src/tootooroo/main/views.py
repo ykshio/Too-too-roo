@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView, View
 from django.shortcuts import render,get_object_or_404, redirect
 from django.urls import reverse_lazy
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
@@ -13,6 +13,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from .models import CustomUser, Toot, Like
+from django.views.generic.base import View
 
 
 
@@ -50,8 +51,12 @@ class TopView(ListView):
             user = self.request.user.customuser
             liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
             context['liked_toots'] = liked_toots
+            context['following_count'] = user.following.count()
+            context['followers_count'] = user.followers.count()
         else:
             context['liked_toots'] = []
+            context['following_count'] = 0
+            context['followers_count'] = 0
         
         # プロフィール画像を含むユーザー情報をコンテキストに追加
         users = CustomUser.objects.all()
@@ -141,9 +146,12 @@ class UserLikedTootsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user.customuser
+        liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
+        context['liked_toots'] = Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
+        context['liked_toot_ids'] = liked_toots  # 追加
         context['user_profile'] = self.request.user.customuser
         return context
-    
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
@@ -256,3 +264,9 @@ class RetootCreateView(RedirectView):
         Retoot.objects.get_or_create(user=user, toot=toot)
         return super().get_redirect_url(*args, **kwargs)
 
+
+class TootLikesView(View):
+    def get(self, request, pk):
+        toot = get_object_or_404(Toot, pk=pk)
+        likes = Like.objects.filter(toot=toot).select_related('user__user')  # select_relatedでuserをプリフェッチ
+        return render(request, 'toot/toot_likes.html', {'toot': toot, 'likes': likes})

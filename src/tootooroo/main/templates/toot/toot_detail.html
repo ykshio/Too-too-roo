@@ -1,13 +1,14 @@
 {% extends 'toot/base.html' %}
 {% load django_bootstrap5 %}
 {% load static %}
+
 {% block main %}
 <div class="card my-3">
     <div class="card-body">
         <a class="nav-link text-dark fs-3" href="{% url 'user_detail' toot.user.id %}">
             <div class="d-flex align-items-center">
                 {% if toot.user.profile_image %}
-                <img src="{{ toot.user.profile_image.url }}" alt="User Image" height="50">
+                <img src="{{ toot.user.profile_image.url }}" alt="User Image" height="50" class="rounded-circle">
                 {% else %}
                 <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
                 {% endif %}
@@ -28,6 +29,34 @@
                     <span>{{ toot.like_count }}</span>
                 </button>
             </form>
+            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#likesModal">
+                <i class="fas fa-users"></i> View Likes
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="likesModal" tabindex="-1" aria-labelledby="likesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="likesModalLabel">Liked by</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% for like in likes %}
+                <div class="d-flex align-items-center mb-2">
+                    {% if like.user.profile_image %}
+                    <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40">
+                    {% else %}
+                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                    {% endif %}
+                    <div class="mx-2">
+                        <h6 class="mb-0">{{ like.user.username }}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
