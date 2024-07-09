@@ -2,7 +2,24 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
+{% block navbar-right %}
+<div class="d-flex justify-content-end">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            並び替え
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+            <li><a class="dropdown-item" href="?sort=newest">新しい順</a></li>
+            <li><a class="dropdown-item" href="?sort=oldest">古い順</a></li>
+            <li><a class="dropdown-item" href="?sort=most_likes">いいねが多い順</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
 {% block main %}
+
 
 {% include 'toot/toot_list.html' %}
 <div class="text-end pe-3 fs-1 toot-button fixed-bottom">

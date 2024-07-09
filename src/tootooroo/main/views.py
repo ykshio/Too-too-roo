@@ -1,6 +1,7 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView, View
 from django.shortcuts import render,get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.db.models import Count
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
 from main.forms import TootForm, ProfileEditForm,  ReplyForm
 from django.contrib.auth import get_user_model
@@ -44,6 +45,19 @@ class TopView(ListView):
     context_object_name = 'toots'
     ordering = ['-created_at']
     login_url = '/login/'
+
+    def get_queryset(self):
+        sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
+
+        if sort_option == 'oldest':
+            queryset = Toot.objects.order_by('created_at')
+        elif sort_option == 'most_likes':
+            # 'likes' という関連名を使用する
+            queryset = Toot.objects.annotate(num_likes=Count('likes')).order_by('-num_likes', '-created_at')
+        else:
+            queryset = Toot.objects.order_by('-created_at')  # デフォルトは新しい順
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -356,9 +370,6 @@ class ReplyCreateView(CreateView):
         return reverse_lazy('toot_detail', kwargs={'pk': self.kwargs['pk']})
 
 
-from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView
-from .models import Hashtag, Toot
 
 class HashtagDetailView(DetailView):
     model = Hashtag
