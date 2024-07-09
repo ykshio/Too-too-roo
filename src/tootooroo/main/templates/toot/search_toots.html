@@ -1,0 +1,13 @@
+<!-- templates/search_toots.html -->
+<h2>Toots</h2>
+{% if toots %}
+    <ul class="list-group">
+        {% for toot in toots %}
+            <li class="list-group-item">
+                <strong>{{ toot.user.username }}:</strong> {{ toot.content }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No toots found.</p>
+{% endif %}

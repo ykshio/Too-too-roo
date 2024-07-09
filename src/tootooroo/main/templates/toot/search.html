@@ -1,0 +1,62 @@
+{% extends 'toot/base.html' %}
+{% load static %}
+{% block main %}
+<div class="container mt-4">
+    <h3 class="mb-4">検索</h3>
+    
+    <!-- 検索フォーム -->
+    <form class="mb-4" method="get" action="{% url 'search' %}">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Toots" aria-label="Search Toots" name="q">
+            <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i>検索</button>
+        </div>
+    </form>
+    
+    
+    {% if toots %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="pb-5 mb-5 my-5">
+                {% for toot in toots %}
+                <div class="card my-3" id="toot-{{ toot.id }}">
+                    <div class="card-body">
+                        <a href="{% url 'toot_detail' toot.id %}" class="text-decoration-none text-dark">
+                            <div class="d-flex align-items-center">
+                                {% if toot.user.profile_image %}
+                                <img src="{{ toot.user.profile_image.url }}" alt="User Image" height="50" class="rounded-circle">
+                                {% else %}
+                                <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
+                                {% endif %}
+                                <div class="mx-2">
+                                    <h5 class="mb-0">{{ toot.user }}</h5>
+                                    <small class="text-muted">{{ toot.created_at }}</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <p class="mb-0">{{ toot.content|truncatewords:5 }}</p>
+                            </div>
+                        </a>
+                        <div class="mt-3">
+                            <form action="{% url 'like_toot' toot.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link p-0" style="color:rgb(247, 124, 210);">
+                                    <i class="fa{% if toot.id in liked_toots %}-solid{% else %}-regular{% endif %} fa-heart"></i>
+                                    <span>{{ toot.like_count }}</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <p class="text-center">投稿はありません</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

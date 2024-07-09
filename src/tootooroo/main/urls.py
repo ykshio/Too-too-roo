@@ -10,6 +10,7 @@ urlpatterns = [
     path('toot/new/', views.TootCreateView.as_view(), name='toot_new'),
     path('toot/<int:pk>/', views.TootDetailView.as_view(), name='toot_detail'),
     path('toot/<int:pk>/edit/', views.TootUpdateView.as_view(), name='toot_edit'),
+    path('toot/<int:pk>/delete/', views.delete_toot, name='delete_toot'),
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
     path('user/<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_edit'),
     # path('user/<int:pk>/follow/', views.UserFollowView.as_view(), name='user_follow'),
@@ -26,4 +27,7 @@ urlpatterns = [
     path('signup/', CreateView.as_view(template_name='toot/signup.html', form_class=UserCreationForm, success_url='/',), name='signup'),
     path('user/<int:user_id>/liked_toots/', views.UserLikedTootsView.as_view(), name='user_liked_toots'),
     path('toot/<int:pk>/likes/', views.TootLikesView.as_view(), name='toot_likes'),
+    path('search/', views.search, name='search'), 
+    path('reply/<int:pk>/delete/', views.delete_reply, name='delete_reply'),
+    path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
 ]

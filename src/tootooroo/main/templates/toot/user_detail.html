@@ -18,6 +18,12 @@
                     <p class="card-text">{{ user_profile.bio }}</p>
                     <p class="card-text"><small class="text-muted">Joined: {{ user_profile.user.date_joined }}</small>
                     </p>
+                    <form class="mb-4" method="get" action="{% url 'search' %}" onsubmit="addFromToQuery()">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search-input" placeholder="Toots" aria-label="Search Toots" name="q">
+                            <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i>検索</button>
+                        </div>
+                    </form>
                     {% if user.is_authenticated %}
                     {% if user == user_profile.user %}
                     <!-- ログインユーザーのプロフィールページ -->
@@ -94,5 +100,12 @@
             });
         });
     });
+</script>
+<script>
+    function addFromToQuery() {
+        const searchInput = document.getElementById('search-input');
+        const fromUsername = "from:{{ user_profile.user.username }} ";
+        searchInput.value = fromUsername + searchInput.value;
+    }
 </script>
 {% endblock %}

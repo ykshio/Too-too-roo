@@ -2,7 +2,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, R
 from django.shortcuts import render,get_object_or_404, redirect
 from django.urls import reverse_lazy
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
-from main.forms import TootForm, ProfileEditForm
+from main.forms import TootForm, ProfileEditForm,  ReplyForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -14,7 +14,9 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 from .models import CustomUser, Toot, Like
 from django.views.generic.base import View
-
+from django.views.decorators.http import require_POST
+from django.db.models import Q
+from django.shortcuts import render
 
 
 def root_view(request):
@@ -90,6 +92,8 @@ class TootDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = TootForm()
+        context['reply_form'] = ReplyForm()  # ここでReplyFormを追加
+        context['replies'] = Reply.objects.filter(toot=self.object)  # ここでリプライを取得
         if self.request.user.is_authenticated:
             user = self.request.user.customuser
             liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
@@ -97,6 +101,19 @@ class TootDetailView(LoginRequiredMixin, DetailView):
         else:
             context['liked_toots'] = []
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        reply_form = context['reply_form']
+        if reply_form.is_valid():
+            reply = reply_form.save(commit=False)
+            reply.user = request.user.customuser
+            reply.toot = self.object
+            reply.save()
+            return redirect('toot_detail', pk=self.object.pk)
+        return self.render_to_response(context)
+
 
 
 class TootUpdateView(UpdateView):
@@ -270,3 +287,66 @@ class TootLikesView(View):
         toot = get_object_or_404(Toot, pk=pk)
         likes = Like.objects.filter(toot=toot).select_related('user__user')  # select_relatedでuserをプリフェッチ
         return render(request, 'toot/toot_likes.html', {'toot': toot, 'likes': likes})
+
+@require_POST
+@login_required
+def delete_toot(request, pk):
+    toot = get_object_or_404(Toot, pk=pk)
+    if request.user.customuser == toot.user:
+        toot.delete()
+    return redirect('top')
+
+@require_POST
+@login_required
+def delete_reply(request, pk):
+    reply = get_object_or_404(Reply, pk=pk)
+    if request.user.customuser == reply.user:
+        reply.delete()
+    return redirect('toot_detail', pk=reply.toot.pk)
+
+
+
+def search(request):
+    query = request.GET.get('q')
+    toots = Toot.objects.none()
+
+    if query:
+        keywords = query.split()
+
+        # 初期化
+        content_query = Q()
+        user_query = Q()
+
+        for keyword in keywords:
+            if keyword.startswith('from:'):
+                username = keyword[5:]  # 'from:' の後ろの部分を抽出
+                user_query &= Q(user__user__username__icontains=username)
+            else:
+                content_query |= Q(content__icontains=keyword)
+
+        # AND条件で結合
+        if user_query:
+            toots = Toot.objects.filter(content_query & user_query)
+        else:
+            toots = Toot.objects.filter(content_query)
+
+    context = {
+        'toots': toots,
+        'query': query,
+    }
+    return render(request, 'toot/search.html', context)
+
+
+
+class ReplyCreateView(CreateView):
+    model = Reply
+    form_class = ReplyForm
+    template_name = 'toot/reply_new.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user.customuser
+        form.instance.toot = get_object_or_404(Toot, pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('toot_detail', kwargs={'pk': self.kwargs['pk']})

@@ -1,0 +1,13 @@
+<!-- templates/search_users.html -->
+<h2>Users</h2>
+{% if users %}
+    <ul class="list-group">
+        {% for user in users %}
+            <li class="list-group-item">
+                {{ user.username }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No users found.</p>
+{% endif %}
