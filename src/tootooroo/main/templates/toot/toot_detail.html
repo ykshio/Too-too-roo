@@ -123,7 +123,7 @@
                 <form id="replyForm" action="{% url 'reply_new' toot.id %}" method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        {{ reply_form.content}}
+                        {{ reply_form.content }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>

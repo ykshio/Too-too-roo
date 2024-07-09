@@ -169,19 +169,31 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{% url 'toot_new' %}">
+                    <form method="post" action="{% url 'toot_new' %}" id="toot-form-modal">
                         {% csrf_token %}
                         {% if form %}
                         {% bootstrap_form form %}
                         {% endif %}
-                        <div class="text-end">{% bootstrap_button button_type='submit' content='トゥトゥる' %}</div>
+                        <div class="text-end">
+                            {% bootstrap_button button_type='submit' content='トゥトゥる' %}
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <!-- base.html の最後に追加 -->
+
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tootTextarea = document.querySelector('#tootModal textarea[name="content"]');
+            tootTextarea.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    document.getElementById('toot-form-modal').submit();
+                }
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.follow-btn').forEach(button => {
                 button.addEventListener('click', function (event) {
@@ -226,8 +238,6 @@
                 });
             });
         });
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function () {
             var lastScrollTop = 0;
             var navbar = document.querySelector('.navbar');
@@ -246,7 +256,7 @@
                 lastScrollTop = scrollTop;
             });
         });
-        
+
     </script>
 
 
