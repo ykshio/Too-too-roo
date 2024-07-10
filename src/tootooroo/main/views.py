@@ -39,7 +39,8 @@ def top_view(request):
 #     return render(request, 'toot/top.html',context)
 
 # 新しいクラスベースのビュー
-class TopView(ListView):
+
+class TopView(LoginRequiredMixin,ListView):
     model = Toot
     template_name = 'toot/top.html'
     context_object_name = 'toots'
@@ -83,7 +84,7 @@ class TopView(ListView):
 
 # 変更点のある箇所のみ示します
 
-class TootCreateView(CreateView):
+class TootCreateView(LoginRequiredMixin,CreateView):
     model = Toot
     form_class = TootForm
     template_name = 'toot/toot_new.html'
@@ -140,13 +141,13 @@ class TootDetailView(LoginRequiredMixin, DetailView):
 
 
 
-class TootUpdateView(UpdateView):
+class TootUpdateView(LoginRequiredMixin,UpdateView):
     model = Toot
     template_name = 'toot/toot_edit.html'
     fields = ['content']
 
 
-class UserDetailView(DetailView):
+class UserDetailView(LoginRequiredMixin,DetailView):
     model = CustomUser
     template_name = 'toot/user_detail.html'
     context_object_name = 'user_profile'
@@ -193,7 +194,7 @@ class UserDetailView(DetailView):
 
 
 
-class UserLikedTootsView(ListView):
+class UserLikedTootsView(LoginRequiredMixin,ListView):
     model = Toot
     template_name = 'toot/user_liked_toots.html'
     context_object_name = 'liked_toots'
@@ -233,7 +234,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     
     
 
-class UserFollowView(RedirectView):
+class UserFollowView(LoginRequiredMixin,RedirectView):
     pattern_name = 'user_detail'
 
     def get_redirect_url(self, *args, **kwargs):
@@ -261,7 +262,7 @@ def user_unfollow(request, pk):
 
 
 
-class UserFollowersView(DetailView):
+class UserFollowersView(LoginRequiredMixin,DetailView):
     model = CustomUser
     template_name = 'toot/user_followers.html'
     context_object_name = 'user_profile'
@@ -273,7 +274,7 @@ class UserFollowersView(DetailView):
         context['followers'] = followers
         return context
 
-class UserFollowingView(DetailView):
+class UserFollowingView(LoginRequiredMixin,DetailView):
     model = CustomUser
     template_name = 'toot/user_following.html'
     context_object_name = 'user_profile'
@@ -287,7 +288,7 @@ class UserFollowingView(DetailView):
 
     
 
-class UserTootsView(ListView):
+class UserTootsView(LoginRequiredMixin,ListView):
     model = Toot
     template_name = 'toot/user_toots.html'
     context_object_name = 'toots'
@@ -296,7 +297,7 @@ class UserTootsView(ListView):
         user = CustomUser.objects.get(pk=self.kwargs['pk'])
         return Toot.objects.filter(user=user).order_by('-created_at')
 
-class ReplyCreateView(CreateView):
+class ReplyCreateView(LoginRequiredMixin,CreateView):
     model = Reply
     template_name = 'toot/reply_new.html'
     fields = ['content']
@@ -320,7 +321,7 @@ class LikeTootView(LoginRequiredMixin, RedirectView):
         referer_url = self.request.META.get('HTTP_REFERER', '/')
         return f"{referer_url}#toot-{toot.id}"
 
-class RetootCreateView(RedirectView):
+class RetootCreateView(LoginRequiredMixin,RedirectView):
     pattern_name = 'toot_detail'
 
     def get_redirect_url(self, *args, **kwargs):
@@ -330,7 +331,7 @@ class RetootCreateView(RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
-class TootLikesView(ListView):
+class TootLikesView(LoginRequiredMixin,ListView):
     template_name = 'toot/toot_likes.html'
     context_object_name = 'likes'
 
@@ -361,7 +362,7 @@ def delete_reply(request, pk):
     return redirect('toot_detail', pk=reply.toot.pk)
 
 
-
+@login_required
 def search(request):
     query = request.GET.get('q')
     toots = Toot.objects.none()
@@ -394,7 +395,7 @@ def search(request):
 
 
 
-class ReplyCreateView(CreateView):
+class ReplyCreateView(LoginRequiredMixin,CreateView):
     model = Reply
     form_class = ReplyForm
     template_name = 'toot/reply_new.html'
@@ -409,7 +410,7 @@ class ReplyCreateView(CreateView):
 
 
 
-class HashtagDetailView(DetailView):
+class HashtagDetailView(LoginRequiredMixin,DetailView):
     model = Hashtag
     template_name = 'toot/hashtag_detail.html'
     context_object_name = 'hashtag'
@@ -426,9 +427,8 @@ class HashtagDetailView(DetailView):
         context['toots'] = Toot.objects.filter(hashtags__id=hashtag.id)
         return context
 
-from django.shortcuts import get_object_or_404, render
-from .models import Toot
 
+@login_required
 def toot_likes(request, toot_id):
     toot = get_object_or_404(Toot, id=toot_id)
     likes = toot.likes.select_related('user')

@@ -22,8 +22,7 @@
             <p class="mb-0">{{ toot.content |linebreaksbr|urlize }}</p>
             <div class="mt-2">
                 {% for hashtag in toot.hashtags.all %}
-                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name
-                    }}</a>
+                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name }}</a>
                 {% endfor %}
             </div>
         </div>
@@ -105,13 +104,14 @@
                         <a href="{% url 'user_detail' like.user.id %}" class="text-decoration-none text-dark">
                             <div class="d-flex align-items-center mb-2">
                                 {% if like.user.profile_image %}
-                                <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40" class="rounded-circle">
+                                <img src="{{ like.user.profile_image.url }}" alt="User Image" height="40"
+                                    class="rounded-circle">
                                 {% else %}
                                 <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
                                 {% endif %}
                                 <div class="mx-2">
                                     <h6 class="mb-0">{{ like.user }}</h6>
-                                    
+
                                 </div>
                                 <div class="m-auto">
                                     <span class="text-muted small">いいねした日時: {{ like.created_at }}</span>

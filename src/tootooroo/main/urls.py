@@ -31,7 +31,6 @@ urlpatterns = [
     path('search/', views.search, name='search'), 
     path('reply/<int:pk>/delete/', views.delete_reply, name='delete_reply'),
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
-    # re_path(r'^hashtag/(?P<slug>[-\w]+)/$', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('toot/<int:toot_id>/likes/', views.toot_likes, name='toot_likes'),
 
