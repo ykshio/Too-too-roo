@@ -126,7 +126,7 @@
         </div>
     </main>
 
-    <footer class="fixed-bottom">
+    <footer class="fixed-bottom footer">
         <!-- {% block footer %}{% endblock %} -->
 
         <div class="bottom-navbar bg-dark py-2">
@@ -240,16 +240,20 @@
         document.addEventListener('DOMContentLoaded', function () {
             var lastScrollTop = 0;
             var navbar = document.querySelector('.navbar');
+            var footer = document.querySelector('.footer');
             navbar.style.top = '0';
+            footer.style.opacity = '1';
             window.addEventListener('scroll', function () {
                 var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
                 if (scrollTop > lastScrollTop) {
                     // 下にスクロールしたとき
                     navbar.style.top = '-100px'; // Adjust this value to your navbar height
+                    footer.style.opacity = '0.6';
                 } else {
                     // 上にスクロールしたとき
                     navbar.style.top = '0';
+                    footer.style.opacity = '1';
                 }
 
                 lastScrollTop = scrollTop;

@@ -97,3 +97,6 @@ main {
     display: inline-block;
     vertical-align: middle;
 }
+.footer{
+    opacity: 1;
+}
