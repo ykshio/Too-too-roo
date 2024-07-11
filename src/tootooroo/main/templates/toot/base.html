@@ -186,10 +186,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const tootTextarea = document.querySelector('#tootModal textarea[name="content"]');
+            let isSubmitting = false; // Flag to check if form is being submitted
+
             tootTextarea.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                     e.preventDefault();
-                    document.getElementById('toot-form-modal').submit();
+                    if (!isSubmitting) { // Check if form is already being submitted
+                        isSubmitting = true; // Set the flag to true to prevent further submissions
+                        document.getElementById('toot-form-modal').submit();
+                    }
                 }
             });
         });

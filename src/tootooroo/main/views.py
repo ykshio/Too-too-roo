@@ -1,5 +1,6 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, RedirectView, View
 from django.shortcuts import render,get_object_or_404, redirect
+from django.http import Http404
 from django.urls import reverse_lazy
 from django.db.models import Count
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
@@ -18,6 +19,10 @@ from django.views.generic.base import View
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from django.shortcuts import render
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.contrib import messages
 
 
 def root_view(request):
@@ -108,6 +113,15 @@ class TootDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'toot'
     login_url = '/login/'  # ログインページのURL
 
+    @method_decorator(never_cache)
+    def get(self, request, *args, **kwargs):
+        try:
+            self.object = self.get_object()
+        except Http404:
+            messages.error(request, 'そのTootは削除されました。')
+            return redirect(reverse('top'))
+        return super().get(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = TootForm()
@@ -457,3 +471,9 @@ def change_background_color(request):
         return redirect('user_profile', user_id=user.id)
 
     return render(request, 'change_background_color.html')
+
+
+
+def custom_404_view(request, exception):
+    messages.error(request, 'そのURLは存在しません。')
+    return redirect('top')

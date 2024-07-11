@@ -1,7 +1,28 @@
 {% extends 'toot/base.html' %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% block extraheader %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let isModalOpen = false; // フラグを初期化
 
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                if (!isModalOpen) { // モーダルが開いていない場合のみ開く
+                    const tootModal = new bootstrap.Modal(document.getElementById('tootModal'));
+                    tootModal.show();
+                    isModalOpen = true; // フラグを設定
+                    // モーダルが閉じた時にフラグをリセット
+                    document.getElementById('tootModal').addEventListener('hidden.bs.modal', function () {
+                        isModalOpen = false;
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
 {% block navbar-right %}
 <div class="d-flex justify-content-end">
     <div class="dropdown">
@@ -19,6 +40,15 @@
 {% endblock %}
 
 {% block main %}
+{% if messages %}
+<div class="container mt-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 
 {% include 'toot/toot_list.html' %}

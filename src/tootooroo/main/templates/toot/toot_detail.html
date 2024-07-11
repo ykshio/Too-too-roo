@@ -166,13 +166,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        const replyTextarea = document.querySelector('#replyModal textarea[name="content"]');
-        replyTextarea.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
+    const replyTextarea = document.querySelector('#replyModal textarea[name="content"]');
+    let isSubmitting = false; // 送信中かどうかを示すフラグ
+
+    replyTextarea.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            if (!isSubmitting) { // フォームがまだ送信されていない場合のみ送信
+                isSubmitting = true; // 送信中フラグを設定
                 document.getElementById('replyForm').submit();
             }
-        });
+        }
     });
+});
 </script>
 {% endblock %}
