@@ -11,7 +11,15 @@ class CustomUser(models.Model):
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     created_at = models.DateTimeField('アカウント作成日', auto_now_add=True)
     updated_at = models.DateTimeField('アカウント更新日', auto_now=True)
-
+    BACKGROUND_COLOR_CHOICES = [
+        ('#343a40', 'ダークカラー'),
+        ('#f8f9fa', 'ライトカラー'),
+        ('#007bff', 'ブルー'),
+        ('#28a745', 'グリーン'),
+        ('#dc3545', 'レッド'),
+    ]
+    background_color = models.CharField('背景色', max_length=7, choices=BACKGROUND_COLOR_CHOICES, default='#343a40') # デフォルトはダークカラー
+    
     def __str__(self):
         return self.user.get_username()
 

@@ -158,7 +158,7 @@ class UserDetailView(LoginRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_profile = self.get_object()
-
+    
         # 並び替えオプションを取得
         sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
 
@@ -433,3 +433,27 @@ def toot_likes(request, toot_id):
     toot = get_object_or_404(Toot, id=toot_id)
     likes = toot.likes.select_related('user')
     return render(request, 'toot/toot_likes.html', {'toot': toot, 'likes': likes})
+
+
+from .forms import BackgroundColorForm
+
+@login_required
+def change_background_color(request):
+    user = request.user
+    if request.method == 'GET' and 'color' in request.GET:
+        color = request.GET.get('color')
+        # 色に応じてユーザーの background_color を更新する処理
+        if color == 'dark':
+            user.customuser.background_color = '#343a40'
+        elif color == 'blue':
+            user.customuser.background_color = '#007bff'
+        elif color == 'green':
+            user.customuser.background_color = '#28a745'
+        elif color == 'red':
+            user.customuser.background_color = '#dc3545'
+        elif color == 'yellow':
+            user.customuser.background_color = '#ffc107'
+        user.customuser.save()
+        return redirect('user_profile', user_id=user.id)
+
+    return render(request, 'change_background_color.html')

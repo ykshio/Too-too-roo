@@ -1,0 +1,23 @@
+<!-- change_color.html -->
+{% load static %}
+{% load django_bootstrap5 %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>色を変更</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>色を選択してください</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% if form %}
+            {% bootstrap_form form %}
+            {% endif %}
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</body>
+</html>

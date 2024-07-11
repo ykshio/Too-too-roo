@@ -14,10 +14,11 @@ class TootForm(forms.ModelForm):
 
 class ProfileEditForm(forms.ModelForm):
     username = forms.CharField(label='ユーザー名', max_length=150)
-
+    background_color = forms.ChoiceField(label='背景色', choices=CustomUser.BACKGROUND_COLOR_CHOICES)
+    
     class Meta:
         model = CustomUser
-        fields = ['username', 'bio', 'profile_image']
+        fields = ['username', 'bio', 'profile_image', 'background_color']
 
     def __init__(self, *args, **kwargs):
         super(ProfileEditForm, self).__init__(*args, **kwargs)
@@ -40,4 +41,18 @@ class ReplyForm(forms.ModelForm):
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'リプライを入力...'}),
+        }
+        
+class BackgroundColorForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['background_color']
+        widgets = {
+            'background_color': forms.RadioSelect(choices=[
+                ('#343a40', 'Dark'),
+                ('#007bff', 'Blue'),
+                ('#28a745', 'Green'),
+                ('#dc3545', 'Red'),
+                ('#ffc107', 'Yellow')
+            ])
         }

@@ -33,5 +33,6 @@ urlpatterns = [
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
     path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('toot/<int:toot_id>/likes/', views.toot_likes, name='toot_likes'),
+    path('change-background-color/', views.change_background_color, name='change_background_color'),
 
 ]
