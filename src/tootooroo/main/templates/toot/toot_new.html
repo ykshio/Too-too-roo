@@ -3,17 +3,42 @@
 
 {% block main %}
 <h2>toot</h2>
-<form method="post" action="{% url 'toot_create' %}" id="toot-form">
+<form method="post" id="toot-form">
     {% csrf_token %}
     {% bootstrap_form form %}
-    {% bootstrap_button button_type='submit' content='トゥトゥる' %}
+    <div class="mb-3">
+        <span id="char-count">0</span> / <span id="max-char-count">{{ form.content.field.max_length }}</span> 文字
+        <span id="char-limit-msg" style="color: red; display: none;">文字数制限に達しました</span>
+    </div>
+    {% bootstrap_button button_type='submit' content='トゥトゥる' id='submit-btn' %}
 </form>
 <script>
-    document.addEventListener('keydown', function (event) {
-        if (event.ctrlKey && event.key === 'Enter') {
-            event.preventDefault();
-            document.getElementById('toot-form').submit();
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('toot-form');
+        var contentField = form.querySelector('#id_content');
+        var charCountSpan = form.querySelector('#char-count');
+        var maxCharCount = parseInt(form.querySelector('#max-char-count').textContent);
+        var charLimitMsg = form.querySelector('#char-limit-msg');
+
+        contentField.addEventListener('input', function () {
+            var currentCharCount = contentField.value.length;
+            charCountSpan.textContent = currentCharCount;
+
+            if (currentCharCount >= maxCharCount) {
+                document.getElementById('submit-btn').disabled = true;
+                charLimitMsg.style.display = 'inline'; // 制限に達したメッセージを表示
+            } else {
+                document.getElementById('submit-btn').disabled = false;
+                charLimitMsg.style.display = 'none'; // 制限メッセージを非表示
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                event.preventDefault();
+                form.submit();
+            }
+        });
     });
 </script>
 {% endblock %}
