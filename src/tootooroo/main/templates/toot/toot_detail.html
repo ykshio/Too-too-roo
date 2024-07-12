@@ -13,7 +13,7 @@
                 <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
                 {% endif %}
                 <div class="mx-2">
-                    <h5 class="mb-0">{{ toot.user }}</h5>
+                    <h5 class="mb-0">{{ toot.get_display_name }} <small class="text-muted">@ {{ toot.get_username }}</small></h5>
                     <small class="text-muted">{{ toot.created_at }}</small>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                         <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
                         {% endif %}
                         <div class="mx-2">
-                            <h6 class="mb-0">{{ reply.user }}</h6>
+                            <h6 class="mb-0">{{ reply.get_display_name }} <small class="text-muted">@ {{ reply.get_username }}</small></h6>
                             <small class="text-muted">{{ reply.created_at }}</small>
                         </div>
                     </div>
@@ -168,7 +168,10 @@
     document.addEventListener('DOMContentLoaded', function () {
     const replyTextarea = document.querySelector('#replyModal textarea[name="content"]');
     let isSubmitting = false; // 送信中かどうかを示すフラグ
-
+    var replyModal = document.getElementById('replyModal');
+    replyModal.addEventListener('shown.bs.modal', function () {
+        replyTextarea.focus();
+    });
     replyTextarea.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();

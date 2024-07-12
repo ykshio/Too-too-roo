@@ -477,3 +477,9 @@ def change_background_color(request):
 def custom_404_view(request, exception):
     messages.error(request, 'そのURLは存在しません。')
     return redirect('top')
+
+
+@login_required
+def my_view(request):
+    user = request.user.customuser
+    return render(request, 'template_name.html', {'user': user})

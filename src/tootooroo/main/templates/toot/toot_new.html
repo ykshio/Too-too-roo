@@ -19,6 +19,10 @@
         var charCountSpan = form.querySelector('#char-count');
         var maxCharCount = parseInt(form.querySelector('#max-char-count').textContent);
         var charLimitMsg = form.querySelector('#char-limit-msg');
+        var tootModal = document.getElementById('tootModal');
+        tootModal.addEventListener('shown.bs.modal', function () {
+            tootTextarea.focus();
+        });
 
         contentField.addEventListener('input', function () {
             var currentCharCount = contentField.value.length;
@@ -30,6 +34,16 @@
             } else {
                 document.getElementById('submit-btn').disabled = false;
                 charLimitMsg.style.display = 'none'; // 制限メッセージを非表示
+            }
+            if (currentCharCount > maxCharCount) {
+                submitButton.disabled = true;
+                charCountSpan.style.color = 'red';
+            } else if (currentCharCount < maxCharCount) {
+                submitButton.disabled = false;
+                charCountSpan.style.color = 'black';
+            } else {
+                submitButton.disabled = false;
+                charCountSpan.style.color = 'orange';
             }
         });
 

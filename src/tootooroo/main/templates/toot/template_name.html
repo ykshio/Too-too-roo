@@ -1,0 +1,4 @@
+{% if user.is_authenticated %}
+    <p>Display Name: {{ user.get_display_name }}</p> <!-- デバッグ出力 -->
+    <p>Username: {{ user.get_username }}</p> <!-- デバッグ出力 -->
+{% endif %}

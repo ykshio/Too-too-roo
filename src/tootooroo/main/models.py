@@ -19,9 +19,18 @@ class CustomUser(models.Model):
         ('#dc3545', 'レッド'),
     ]
     background_color = models.CharField('背景色', max_length=7, choices=BACKGROUND_COLOR_CHOICES, default='#343a40') # デフォルトはダークカラー
+    display_name = models.CharField('表示名', max_length=150, default='', blank=True)   # 表示名フィールドを追加、デフォルトは空文字列
     
     def __str__(self):
-        return self.user.get_username()
+        return f"{self.display_name} @ {self.user.username}" if self.display_name else self.user.username
+    
+    def get_display_name(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.display_name  # 例: デフォルトでは display_name を返す
+
+    def get_username(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.username  # 例: デフォルトでは username を返す
 
 class Hashtag(models.Model):
     name = models.CharField('ハッシュタグ', max_length=255, unique=True)
@@ -55,7 +64,7 @@ class Toot(models.Model):
     hashtags = models.ManyToManyField(Hashtag, blank=True, related_name='toots')
 
     def __str__(self):
-        return self.content
+        return f"{self.get_display_name()} @ {self.get_username()}: {self.content}"
     
     @property
     def reply_count(self):
@@ -71,6 +80,14 @@ class Toot(models.Model):
         for tag in hashtags:
             hashtag, created = Hashtag.objects.get_or_create(name=tag)
             self.hashtags.add(hashtag)
+    
+    def get_display_name(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.display_name  # 例: デフォルトでは display_name を返す
+
+    def get_username(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.user.username  # 例: デフォルトでは username を返す
 
 class Follow(models.Model):
     follower = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='following', verbose_name='フォロワー')
@@ -91,6 +108,14 @@ class Reply(models.Model):
 
     def __str__(self):
         return self.content
+    
+    def get_display_name(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.display_name  # 例: デフォルトでは display_name を返す
+
+    def get_username(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.user.username  # 例: デフォルトでは username を返す
 
 class Like(models.Model):
     toot = models.ForeignKey(Toot, on_delete=models.CASCADE, related_name='likes', verbose_name='トゥート')
@@ -101,6 +126,14 @@ class Like(models.Model):
         constraints = [
             UniqueConstraint(fields=['toot', 'user'], name='unique_like')
         ]
+    
+    def get_display_name(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.display_name  # 例: デフォルトでは display_name を返す
+
+    def get_username(self):
+        # ページごとにカスタマイズして取得するロジックを記述
+        return self.user.user.username  # 例: デフォルトでは username を返す
 
 class Retoot(models.Model):
     toot = models.ForeignKey(Toot, on_delete=models.CASCADE, related_name='retoot_retoots', verbose_name='トゥート')

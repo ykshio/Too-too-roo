@@ -30,7 +30,8 @@
                 <img src="{% static 'media/icon.png' %}" class="card-img-top" alt="{{ user_profile.user.username }}">
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ user_profile.user.username }}</h5>
+                    <h5 class="card-title">{{ user_profile.display_name }} </h5>
+                    <h6>@ {{ user_profile.user.username }}</h6>
                     <p class="card-text">{{ user_profile.bio }}</p>
                     <p class="card-text"><small class="text-muted">Joined: {{ user_profile.user.date_joined }}</small>
                     </p>

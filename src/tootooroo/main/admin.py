@@ -2,7 +2,7 @@ from django.contrib import admin
 from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bio', 'created_at', 'updated_at','background_color')
+    list_display = ('user','display_name', 'bio', 'created_at', 'updated_at','background_color')
     search_fields = ('user__username', 'bio')
 
 class TootAdmin(admin.ModelAdmin):

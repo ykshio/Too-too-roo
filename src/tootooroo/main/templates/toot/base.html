@@ -68,7 +68,7 @@
         </div>
         {% if user.is_authenticated %}
         <div class="offcanvas-body">
-            <h3>{{ user.username }}</h3>
+            <h3><span>{{ user.get_display_name }}</span>@<span>{{ user.get_username }}</span></h3>
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link text-light fs-3" href="{% url 'root' %}" style="z-index: 100;">
@@ -183,31 +183,21 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const tootTextarea = document.querySelector('#tootModal textarea[name="content"]');
+            const tootTextarea = document.querySelector('#toot-form-modal textarea[name="content"]');
             const charCountSpan = document.getElementById('char-count');
             const maxCharCount = parseInt(document.getElementById('max-char-count').textContent);
             const submitButton = document.getElementById('submit-btn');
+            const charLimitMsg = document.getElementById('char-limit-msg');
+            // モーダルが表示されたときにテキストエリアを選択
+            var tootModal = document.getElementById('tootModal');
+            tootModal.addEventListener('shown.bs.modal', function () {
+                tootTextarea.focus();
+            });
+            
+            updateCharCount();
 
             tootTextarea.addEventListener('input', function () {
-                const currentCharCount = tootTextarea.value.length;
-                charCountSpan.textContent = currentCharCount;
-
-                if (currentCharCount > maxCharCount) {
-                    alert('文字数が制限を超えています。制限内に収めてください。');
-                    tootTextarea.value = tootTextarea.value.slice(0, maxCharCount);
-                    charCountSpan.textContent = maxCharCount;
-                }
-
-                if (currentCharCount > maxCharCount) {
-                    submitButton.disabled = true;
-                    charCountSpan.style.color = 'red';
-                } else if (currentCharCount < maxCharCount){
-                    submitButton.disabled = false;
-                    charCountSpan.style.color = 'black';
-                } else{
-                    submitButton.disabled = false;
-                    charCountSpan.style.color = 'orange';
-                }
+                updateCharCount();
             });
 
             tootTextarea.addEventListener('keydown', function (e) {
@@ -218,7 +208,30 @@
                     }
                 }
             });
+
+            function updateCharCount() {
+                const currentCharCount = tootTextarea.value.length;
+                charCountSpan.textContent = currentCharCount;
+
+                if (currentCharCount >= maxCharCount) {
+                    tootTextarea.value = tootTextarea.value.slice(0, maxCharCount);
+                    charCountSpan.textContent = maxCharCount;
+                    charLimitMsg.style.display = 'inline'; // 文字数制限メッセージを表示
+                    charLimitMsg.style.color = 'red'; // メッセージの色を設定
+                } else {
+                    charLimitMsg.style.display = 'none'; // 文字数制限メッセージを非表示
+                }
+
+                if (currentCharCount === maxCharCount) {
+                    charCountSpan.style.color = 'orange';
+                } else {
+                    charCountSpan.style.color = 'black';
+                }
+
+                submitButton.disabled = currentCharCount === 0 || currentCharCount > maxCharCount;
+            }
         });
+
 
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.follow-btn').forEach(button => {
