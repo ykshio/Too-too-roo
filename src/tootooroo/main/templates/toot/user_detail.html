@@ -37,8 +37,10 @@
                     </p>
                     <form class="mb-4" method="get" action="{% url 'search' %}" onsubmit="addFromToQuery()">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="search-input" placeholder="Toots" aria-label="Search Toots" name="q">
-                            <button class="btn btn-outline-primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i>検索</button>
+                            <input type="text" class="form-control" id="search-input" placeholder="Toots"
+                                aria-label="Search Toots" name="q">
+                            <button class="btn btn-outline-primary" type="submit"><i
+                                    class="fa-solid fa-magnifying-glass"></i>検索</button>
                         </div>
                     </form>
                     {% if user.is_authenticated %}
@@ -51,13 +53,14 @@
                     </form>
                     {% else %}
                     <!-- 他のユーザーのプロフィールページ -->
-                    <!-- user_detail.html -->
                     {% if is_following %}
-                    <a href="{% url 'user_unfollow' pk=user_profile.pk %}"
-                        class="btn btn-secondary follow-btn">フォロー解除</a>
+                    <a href="#" class="btn btn-secondary follow-btn" data-following="true"
+                        data-user-id="{{ user_profile.pk }}">フォロー解除</a>
                     {% else %}
-                    <a href="{% url 'user_follow' pk=user_profile.pk %}" class="btn btn-primary follow-btn">フォローする</a>
+                    <a href="#" class="btn btn-primary follow-btn" data-following="false"
+                        data-user-id="{{ user_profile.pk }}">フォローする</a>
                     {% endif %}
+
                     {% endif %}
                     {% endif %}
                 </div>
@@ -74,7 +77,7 @@
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="likes-tab" data-bs-toggle="tab" href="#likes" role="tab"
                         aria-controls="likes" aria-selected="false">
-                        Likes 
+                        Likes
                         <!-- ({{ likes_count }}) -->
                     </a>
                 </li>
@@ -109,7 +112,7 @@
     </div>
 </div>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         var activeTab = localStorage.getItem('activeTab');
         if (activeTab) {
             var tabElement = document.querySelector(`a[href="${activeTab}"]`);
@@ -118,14 +121,45 @@
         }
 
         var tabLinks = document.querySelectorAll('a[data-bs-toggle="tab"]');
-        tabLinks.forEach(function(tabLink) {
-            tabLink.addEventListener('shown.bs.tab', function(event) {
+        tabLinks.forEach(function (tabLink) {
+            tabLink.addEventListener('shown.bs.tab', function (event) {
                 localStorage.setItem('activeTab', event.target.getAttribute('href'));
             });
         });
     });
-</script>
-<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const followButtons = document.querySelectorAll('.follow-btn');
+
+        followButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const userId = this.getAttribute('data-user-id');
+                const isFollowing = this.getAttribute('data-following') === 'true';
+
+                const url = isFollowing ? `/user/${userId}/unfollow/` : `/user/${userId}/follow/`;
+                const method = 'POST';
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'followed' || data.status === 'unfollowed') {
+                        // フォロー・フォロー解除が成功した場合、ページをリロード
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
     function addFromToQuery() {
         const searchInput = document.getElementById('search-input');
         const fromUsername = "from:{{ user_profile.user.username }} ";

@@ -161,7 +161,7 @@ class TootUpdateView(LoginRequiredMixin,UpdateView):
     fields = ['content']
 
 
-class UserDetailView(LoginRequiredMixin,DetailView):
+class UserDetailView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'toot/user_detail.html'
     context_object_name = 'user_profile'
@@ -189,7 +189,7 @@ class UserDetailView(LoginRequiredMixin,DetailView):
         if self.request.user.is_authenticated:
             liked_toots = Like.objects.filter(user=user_profile).values_list('toot_id', flat=True)
             context['liked_toots'] = Toot.objects.filter(id__in=liked_toots).order_by('-created_at')
-            context['is_following'] = self.request.user.customuser.following.filter(pk=user_profile.pk).exists()
+            context['is_following'] = Follow.objects.filter(follower=self.request.user.customuser, following=user_profile).exists()
         else:
             context['liked_toots'] = []
             context['is_following'] = False
@@ -205,6 +205,7 @@ class UserDetailView(LoginRequiredMixin,DetailView):
         context['liked_by_users'] = liked_by_users
 
         return context
+
 
 
 
@@ -478,8 +479,18 @@ def custom_404_view(request, exception):
     messages.error(request, 'そのURLは存在しません。')
     return redirect('top')
 
+@login_required
+def follow_user(request, pk):
+    user_to_follow = get_object_or_404(CustomUser, pk=pk)
+    if not Follow.objects.filter(follower=request.user.customuser, following=user_to_follow).exists():
+        Follow.objects.create(follower=request.user.customuser, following=user_to_follow)
+        return JsonResponse({'status': 'followed'})
+    return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
-def my_view(request):
-    user = request.user.customuser
-    return render(request, 'template_name.html', {'user': user})
+def unfollow_user(request, pk):
+    if request.method == 'POST' and request.user.is_authenticated:
+        user_to_unfollow = get_object_or_404(CustomUser, pk=pk)
+        Follow.objects.filter(follower=request.user.customuser, following=user_to_unfollow).delete()
+        return JsonResponse({'status': 'unfollowed'})
+    return JsonResponse({'status': 'error'}, status=400)

@@ -169,7 +169,8 @@
                         {% bootstrap_form form %}
                         {% endif %}
                         <div class="mb-3">
-                            <span id="char-count">0</span> / <span id="max-char-count">{{ form.content.field.max_length }}</span> 文字
+                            <span id="char-count">0</span> / <span id="max-char-count">{{ form.content.field.max_length
+                                }}</span> 文字
                             <span id="char-limit-msg" style="color: red; display: none;">文字数制限に達しました</span>
                         </div>
                         <div class="text-end">
@@ -193,7 +194,7 @@
             tootModal.addEventListener('shown.bs.modal', function () {
                 tootTextarea.focus();
             });
-            
+
             updateCharCount();
 
             tootTextarea.addEventListener('input', function () {
@@ -303,21 +304,28 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             var form = document.getElementById('toot-form-modal');
-            var contentField = form.querySelector('#id_content');
-            var charCountSpan = form.querySelector('#char-count');
-            var maxCharCount = parseInt(form.querySelector('#max-char-count').textContent);
 
-            contentField.addEventListener('input', function () {
-                var currentCharCount = contentField.value.length;
-                charCountSpan.textContent = currentCharCount;
+            // フォームが存在する場合のみ処理を続ける
+            if (form) {
+                var contentField = form.querySelector('#id_content');
+                var charCountSpan = form.querySelector('#char-count');
+                var maxCharCountElement = form.querySelector('#max-char-count');
 
-                if (currentCharCount > maxCharCount) {
-                    document.getElementById('submit-btn').disabled = true;
-                } else {
-                    document.getElementById('submit-btn').disabled = false;
+                // 最大文字数要素が存在するか確認
+                if (maxCharCountElement) {
+                    var maxCharCount = parseInt(maxCharCountElement.textContent);
+
+                    contentField.addEventListener('input', function () {
+                        var currentCharCount = contentField.value.length;
+                        charCountSpan.textContent = currentCharCount;
+
+                        // 文字数制限のチェック
+                        document.getElementById('submit-btn').disabled = currentCharCount > maxCharCount;
+                    });
                 }
-            });
+            }
         });
+
     </script>
 </body>
 

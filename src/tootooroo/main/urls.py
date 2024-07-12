@@ -17,8 +17,10 @@ urlpatterns = [
     # path('user/<int:pk>/follow/', views.UserFollowView.as_view(), name='user_follow'),
     path('user/<int:pk>/followers/', views.UserFollowersView.as_view(), name='user_followers'),
     path('user/<int:pk>/following/', views.UserFollowingView.as_view(), name='user_following'),
-    path('user/<int:pk>/unfollow/', views.user_unfollow, name='user_unfollow'),
-    path('user/<int:pk>/follow/', views.user_follow, name='user_follow'),
+    # path('user/<int:pk>/unfollow/', views.user_unfollow, name='user_unfollow'),
+    # path('user/<int:pk>/follow/', views.user_follow, name='user_follow'),
+    path('user/<int:pk>/follow/', views.follow_user, name='user_follow'),
+    path('user/<int:pk>/unfollow/', views.unfollow_user, name='user_unfollow'),
     path('user/<int:pk>/toots/', views.UserTootsView.as_view(), name='user_toots'),
     path('toot/<int:pk>/reply/', views.ReplyCreateView.as_view(), name='reply_new'),
     path('toot/<int:pk>/like/', views.LikeTootView.as_view(), name='like_toot'),
@@ -34,6 +36,5 @@ urlpatterns = [
     path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('toot/<int:toot_id>/likes/', views.toot_likes, name='toot_likes'),
     path('change-background-color/', views.change_background_color, name='change_background_color'),
-    path('template_name/', views.my_view, name='template_name'),
 
 ]
