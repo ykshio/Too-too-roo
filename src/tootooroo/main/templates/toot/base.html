@@ -204,11 +204,11 @@
             tootTextarea.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                     e.preventDefault();
-                    if (!isModalOpen){
+                    if (!isModalOpen) {
                         if (!submitButton.disabled) {
-                        document.getElementById('toot-form-modal').submit();
-                        isModalOpen=true;
-                    }
+                            document.getElementById('toot-form-modal').submit();
+                            isModalOpen = true;
+                        }
 
                     }
                 }
@@ -329,6 +329,18 @@
                 }
             }
         });
+        const contentInput = document.getElementById('id_content'); // コンテンツの入力フィールド
+        const submitButton = document.getElementById('submit-btn');
+
+        function checkInputValidity() {
+            const contentTrimmed = contentInput.value.trim();
+
+            // スペースだけまたは空の場合はボタンを無効化
+            submitButton.disabled = contentTrimmed === '';
+        }
+
+        contentInput.addEventListener('input', checkInputValidity);
+        checkInputValidity(); // ページロード時にチェックを実行
 
     </script>
 </body>

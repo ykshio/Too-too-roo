@@ -117,4 +117,37 @@
     });
   });
 </script> -->
+
+<script>
+  const displayNameInput = document.getElementById('id_display_name');
+  const usernameInput = document.getElementById('id_user').value; // ユーザー名は非表示で受け取る場合
+  const submitButton = document.getElementById('submitButton');
+
+  function checkInputLength() {
+      const displayNameLength = displayNameInput.value.length;
+      const usernameLength = usernameInput.length; // usernameはフォームには含まれていない場合
+
+      // 文字数制限を設定
+      if (displayNameLength > 30 || usernameLength > 30) {
+          submitButton.disabled = true;
+      } else {
+          submitButton.disabled = false;
+      }
+  }
+  function checkInputValidity() {
+      const displayNameTrimmed = displayNameInput.value.trim();
+      const usernameTrimmed = usernameInput.trim(); // ユーザー名もトリミング
+
+      // スペースだけまたは空の場合はボタンを無効化
+      if (displayNameTrimmed === '' || usernameTrimmed === '') {
+          submitButton.disabled = true;
+      } else {
+          submitButton.disabled = false;
+      }
+  }
+
+
+  displayNameInput.addEventListener('input', checkInputLength);
+  checkInputLength(); // ページロード時にチェックを実行
+</script>
 {% endblock %}

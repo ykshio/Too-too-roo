@@ -14,11 +14,7 @@ urlpatterns = [
     path('toot/<int:pk>/delete/', views.delete_toot, name='delete_toot'),
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user_detail'),
     path('user/<int:pk>/edit/', views.UserUpdateView.as_view(), name='user_edit'),
-    # path('user/<int:pk>/follow/', views.UserFollowView.as_view(), name='user_follow'),
-    # path('user/<int:pk>/followers/', views.UserFollowersView.as_view(), name='user_followers'),
-    # path('user/<int:pk>/following/', views.UserFollowingView.as_view(), name='user_following'),
-    # path('user/<int:pk>/unfollow/', views.user_unfollow, name='user_unfollow'),
-    # path('user/<int:pk>/follow/', views.user_follow, name='user_follow'),
+
     path('user/<str:username>/followers/', views.follower_list, name='follower_list'),
     path('user/<str:username>/following/', views.following_list, name='following_list'),
     path('user/<int:pk>/follow/', views.follow_user, name='user_follow'),

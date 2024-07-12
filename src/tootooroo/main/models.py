@@ -20,7 +20,7 @@ class CustomUser(models.Model):
         ('#dc3545', 'レッド'),
     ]
     background_color = models.CharField('背景色', max_length=7, choices=BACKGROUND_COLOR_CHOICES, default='#343a40') # デフォルトはダークカラー
-    display_name = models.CharField('表示名', max_length=150, default='', blank=True)   # 表示名フィールドを追加、デフォルトは空文字列
+    display_name = models.CharField('表示名', max_length=30, default='', blank=True)   # 表示名フィールドを追加、デフォルトは空文字列
     
     def __str__(self):
         return f"{self.display_name} @ {self.user.username}" if self.display_name else self.user.username
