@@ -110,9 +110,8 @@
                         <div class="card-body">
                             <a href="{% url 'user_detail' follow.follower.pk %}" class="text-decoration-none text-dark">
                                 <div class="d-flex align-items-center mb-2">
-                                    {% if like.user.profile_image %}
-                                    <img src="{{ follow.follower.profile_image.url }}" alt="User Image" height="40"
-                                        class="rounded-circle">
+                                    {% if follow.follower.profile_image %}
+                                    <img src="{{ follow.follower.profile_image.url }}" alt="User Image" height="40" class="rounded-circle">
                                     {% else %}
                                     <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
                                     {% endif %}
@@ -139,7 +138,7 @@
                         <div class="card-body">
                             <a href="{% url 'user_detail' follow.following.pk %}" class="text-decoration-none text-dark">
                                 <div class="d-flex align-items-center mb-2">
-                                    {% if like.user.profile_image %}
+                                    {% if follow.following.profile_image %}
                                     <img src="{{ follow.following.profile_image.url }}" alt="User Image" height="40"
                                         class="rounded-circle">
                                     {% else %}

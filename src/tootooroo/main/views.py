@@ -45,7 +45,7 @@ def top_view(request):
 
 # 新しいクラスベースのビュー
 
-class TopView(LoginRequiredMixin,ListView):
+class TopView(LoginRequiredMixin, ListView):
     model = Toot
     template_name = 'toot/top.html'
     context_object_name = 'toots'
@@ -54,14 +54,28 @@ class TopView(LoginRequiredMixin,ListView):
 
     def get_queryset(self):
         sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
+        filter_option = self.request.GET.get('filter', 'all')  # デフォルトは全てのToot
+
+        if self.request.user.is_authenticated:
+            user = CustomUser.objects.get(user=self.request.user)
+
+            if filter_option == 'following':
+                following_users = Follow.objects.filter(follower=user).values_list('following', flat=True)
+                queryset = Toot.objects.filter(user__in=following_users)
+            elif filter_option == 'follower':
+                follower_users = Follow.objects.filter(following=user).values_list('follower', flat=True)
+                queryset = Toot.objects.filter(user__in=follower_users)
+            else:
+                queryset = Toot.objects.all()
+        else:
+            queryset = Toot.objects.all()
 
         if sort_option == 'oldest':
-            queryset = Toot.objects.order_by('created_at')
+            queryset = queryset.order_by('created_at')
         elif sort_option == 'most_likes':
-            # 'likes' という関連名を使用する
-            queryset = Toot.objects.annotate(num_likes=Count('likes')).order_by('-num_likes', '-created_at')
+            queryset = queryset.annotate(num_likes=Count('likes')).order_by('-num_likes', '-created_at')
         else:
-            queryset = Toot.objects.order_by('-created_at')  # デフォルトは新しい順
+            queryset = queryset.order_by('-created_at')  # デフォルトは新しい順
 
         return queryset
 
@@ -70,7 +84,7 @@ class TopView(LoginRequiredMixin,ListView):
         context['form'] = TootForm()
         
         if self.request.user.is_authenticated:
-            user = self.request.user.customuser
+            user = CustomUser.objects.get(user=self.request.user)
             liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
             context['liked_toots'] = liked_toots
             context['following_count'] = user.following.count()
@@ -85,9 +99,14 @@ class TopView(LoginRequiredMixin,ListView):
         user_profiles = {user.user.id: user for user in users}
         context['user_profiles'] = user_profiles
 
+        # 並び替えと絞り込みの選択オプションをコンテキストに追加
+        context['sort_option'] = self.request.GET.get('sort', 'newest')
+        context['filter_option'] = self.request.GET.get('filter', 'all')
+
         return context
 
-# 変更点のある箇所のみ示します
+
+
 
 class TootCreateView(LoginRequiredMixin,CreateView):
     model = Toot

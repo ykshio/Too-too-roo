@@ -25,15 +25,34 @@
 {% endblock %}
 {% block navbar-right %}
 <div class="d-flex justify-content-end">
-    <div class="dropdown">
+    <div class="dropdown mx-1">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown"
             aria-expanded="false">
             並び替え
         </button>
         <ul class="dropdown-menu" aria-labelledby="sortDropdown">
-            <li><a class="dropdown-item" href="?sort=newest">新しい順</a></li>
-            <li><a class="dropdown-item" href="?sort=oldest">古い順</a></li>
-            <li><a class="dropdown-item" href="?sort=most_likes">いいねが多い順</a></li>
+            <li><a class="dropdown-item"
+                    href="?sort=newest{% if filter_option %}&filter={{ filter_option }}{% endif %}">新しい順</a></li>
+            <li><a class="dropdown-item"
+                    href="?sort=oldest{% if filter_option %}&filter={{ filter_option }}{% endif %}">古い順</a></li>
+            <li><a class="dropdown-item"
+                    href="?sort=most_likes{% if filter_option %}&filter={{ filter_option }}{% endif %}">いいねが多い順</a></li>
+        </ul>
+    </div>
+    <div class="dropdown mx-1">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            絞り込み
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+            <li><a class="dropdown-item"
+                    href="?filter=all{% if sort_option %}&sort={{ sort_option }}{% endif %}">全てのToot</a></li>
+            <li><a class="dropdown-item"
+                    href="?filter=following{% if sort_option %}&sort={{ sort_option }}{% endif %}">フォローしてる人のToot</a>
+            </li>
+            <li><a class="dropdown-item"
+                    href="?filter=follower{% if sort_option %}&sort={{ sort_option }}{% endif %}">フォローされてる人のToot</a>
+            </li>
         </ul>
     </div>
 </div>
