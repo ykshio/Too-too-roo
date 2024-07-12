@@ -102,3 +102,8 @@ main {
 .footer{
     opacity: 1;
 }
+
+#submitButton:disabled {
+    opacity: 0.65; /* スタイルの調整 */
+    pointer-events: none; /* クリックを無効化 */
+}

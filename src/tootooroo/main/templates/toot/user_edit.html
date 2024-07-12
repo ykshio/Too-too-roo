@@ -122,13 +122,15 @@
   const displayNameInput = document.getElementById('id_display_name');
   const usernameInput = document.getElementById('id_user').value; // ユーザー名は非表示で受け取る場合
   const submitButton = document.getElementById('submitButton');
+  const bioInput = document.getElementById('id_bio');
 
   function checkInputLength() {
       const displayNameLength = displayNameInput.value.length;
       const usernameLength = usernameInput.length; // usernameはフォームには含まれていない場合
+      const bioLength = bioInput.value.length;
 
       // 文字数制限を設定
-      if (displayNameLength > 30 || usernameLength > 30) {
+      if (displayNameLength > 30 || usernameLength > 30 || bioLength > 300) {
           submitButton.disabled = true;
       } else {
           submitButton.disabled = false;
