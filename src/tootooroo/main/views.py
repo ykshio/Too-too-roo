@@ -246,6 +246,10 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('user_detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        # トリミングされた画像をフォームから取得し、処理が必要な場合はここに追加
+        return super().form_valid(form)
     
     
 

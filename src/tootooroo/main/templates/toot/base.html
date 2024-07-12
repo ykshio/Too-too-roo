@@ -188,6 +188,7 @@
             const maxCharCount = parseInt(document.getElementById('max-char-count').textContent);
             const submitButton = document.getElementById('submit-btn');
             const charLimitMsg = document.getElementById('char-limit-msg');
+            let isModalOpen = false; // フラグを初期化
             // モーダルが表示されたときにテキストエリアを選択
             var tootModal = document.getElementById('tootModal');
             tootModal.addEventListener('shown.bs.modal', function () {
@@ -203,8 +204,12 @@
             tootTextarea.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                     e.preventDefault();
-                    if (!submitButton.disabled) {
+                    if (!isModalOpen){
+                        if (!submitButton.disabled) {
                         document.getElementById('toot-form-modal').submit();
+                        isModalOpen=true;
+                    }
+
                     }
                 }
             });
