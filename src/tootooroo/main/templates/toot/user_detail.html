@@ -120,8 +120,8 @@
                                         {{ follow.follower.display_name }} @ {{ follow.follower.get_username }}
 
                                     </div>
-                                    <div class="m-auto">
-                                        <span class="text-muted small">フォーローされた日時:{{ follow.follower.created_at|date:"Y年m月d日 H:i" }}</span>
+                                    <div class="m-auto mr-3">
+                                        <span class="text-muted">{{ follow.follower.bio }}</span>
                                     </div>
                                 </div>
                             </a>
@@ -150,7 +150,7 @@
 
                                     </div>
                                     <div class="m-auto">
-                                        <span class="text-muted small">フォーローした日時:{{ follow.created_at|date:"Y年m月d日 H:i" }}</span>
+                                        <span class="text-muted ">{{ follow.following.bio }}</span>
                                     </div>
                                 </div>
                             </a>
