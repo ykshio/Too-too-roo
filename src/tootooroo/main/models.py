@@ -4,6 +4,7 @@ import re
 from django.utils.text import slugify
 from unidecode import unidecode
 from django.db.models import UniqueConstraint
+from PIL import Image 
 
 class CustomUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -31,6 +32,17 @@ class CustomUser(models.Model):
     def get_username(self):
         # ページごとにカスタマイズして取得するロジックを記述
         return self.user.username  # 例: デフォルトでは username を返す
+    
+    def save(self, *args, **kwargs):
+        if self.profile_image:
+            img = Image.open(self.profile_image)
+            img = img.convert('RGB')
+            size = min(img.size)  # 小さい方のサイズを取得
+            img = img.crop((0, 0, size, size))  # 正方形にトリミング
+            img = img.resize((300, 300), Image.LANCZOS)  # LANCZOSに変更
+            img.save(self.profile_image.path)
+
+        super(CustomUser, self).save(*args, **kwargs)
 
 class Hashtag(models.Model):
     name = models.CharField('ハッシュタグ', max_length=255, unique=True)
@@ -98,6 +110,7 @@ class Follow(models.Model):
         constraints = [
             UniqueConstraint(fields=['follower', 'following'], name='unique_follow')
         ]
+
 
 class Reply(models.Model):
     toot = models.ForeignKey(Toot, on_delete=models.CASCADE, related_name='replies', verbose_name='トゥート')

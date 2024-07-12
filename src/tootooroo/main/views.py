@@ -277,7 +277,7 @@ def user_unfollow(request, pk):
 
 
 
-class UserFollowersView(LoginRequiredMixin,DetailView):
+class UserFollowersView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'toot/user_followers.html'
     context_object_name = 'user_profile'
@@ -285,9 +285,11 @@ class UserFollowersView(LoginRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_profile = self.get_object()
-        followers = Follow.objects.filter(following=user_profile)
+        followers = user_profile.followers.all().select_related('follower')
         context['followers'] = followers
         return context
+
+
 
 class UserFollowingView(LoginRequiredMixin,DetailView):
     model = CustomUser
