@@ -74,6 +74,8 @@ main {
 .modal-body {
     position: relative;
     padding: 1.5rem;
+    max-height: 60vh; /* モーダルの最大高さ */
+    overflow-y: auto; /* コンテンツがオーバーフローした場合にスクロール */
 }
 
 .modal-footer {

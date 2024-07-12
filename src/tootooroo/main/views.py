@@ -161,6 +161,12 @@ class TootUpdateView(LoginRequiredMixin,UpdateView):
     fields = ['content']
 
 
+from django.shortcuts import get_object_or_404
+from django.db.models import Count
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import DetailView
+from .models import CustomUser, Toot, Like, Follow
+
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'toot/user_detail.html'
@@ -172,9 +178,9 @@ class UserDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_profile = self.get_object()
-    
+        
         # 並び替えオプションを取得
-        sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
+        sort_option = self.request.GET.get('sort', 'newest')
 
         if sort_option == 'oldest':
             context['toots'] = Toot.objects.filter(user=user_profile).order_by('created_at')
@@ -200,11 +206,17 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         context['following_count'] = user_profile.following.count()
         context['followers_count'] = user_profile.followers.count()
 
+        # フォロワーリストを取得してcontextに追加
+        context['followers'] = user_profile.followers.all()
+        context['following'] = user_profile.following.all()
+
         # いいねしたユーザーのリストを取得してcontextに追加
         liked_by_users = Like.objects.filter(toot__user=user_profile).select_related('user')
         context['liked_by_users'] = liked_by_users
 
         return context
+
+
 
 
 
@@ -280,7 +292,6 @@ def user_unfollow(request, pk):
 
 
 
-
 class UserFollowersView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'toot/user_followers.html'
@@ -290,9 +301,13 @@ class UserFollowersView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         user_profile = self.get_object()
         followers = user_profile.followers.all().select_related('follower')
+
+        # デバッグ用: フォロワーの情報を出力
+        for follower in followers:
+            print(f"Follower: {follower.follower.username}, Bio: {follower.follower.bio}")
+
         context['followers'] = followers
         return context
-
 
 
 class UserFollowingView(LoginRequiredMixin,DetailView):
@@ -500,3 +515,14 @@ def unfollow_user(request, pk):
         Follow.objects.filter(follower=request.user.customuser, following=user_to_unfollow).delete()
         return JsonResponse({'status': 'unfollowed'})
     return JsonResponse({'status': 'error'}, status=400)
+
+
+def follower_list(request, username):
+    user = get_object_or_404(CustomUser, user__username=username)
+    followers = user.followers.all()  # フォロワーを取得
+    return render(request, 'follower.html', {'user': user, 'followers': followers})
+
+def following_list(request, username):
+    user = get_object_or_404(CustomUser, user__username=username)
+    following = user.following.all()  # フォロー中のユーザーを取得
+    return render(request, 'following.html', {'user': user, 'following': following})

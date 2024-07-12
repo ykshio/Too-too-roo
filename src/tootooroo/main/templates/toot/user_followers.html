@@ -1,24 +1,14 @@
-{% for follower in followers %}
-<div class="card my-3">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                {% if follower.profile_image %}
-                <img src="{{ follower.profile_image.url }}" alt="Profile Image" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
-                {% else %}
-                <div class="rounded-circle bg-secondary" style="width: 50px; height: 50px;"></div>
-                {% endif %}
-                <div class="ms-3">
-                    <h5 class="card-title">{{ follower.username }}</h5>
-                    <p class="card-text">{{ follower.bio }}</p>
-                </div>
-            </div>
-            <div>
-                <a href="{% url 'user_detail' follower.pk %}" class="btn btn-primary">View Profile</a>
-            </div>
-        </div>
-    </div>
-</div>
-{% empty %}
-<p>No followers yet.</p>
-{% endfor %}
+{% extends 'toot/base.html' %}
+
+{% block main %}
+<h2>{{ user.display_name }}のフォロワー</h2>
+<ul>
+    {% for follower in followers %}
+    <li>
+        <a href="{% url 'user_detail' follower.user.username %}">{{ follower.display_name }}</a>
+    </li>
+    {% empty %}
+    <li>フォロワーはまだいません。</li>
+    {% endfor %}
+</ul>
+{% endblock %}

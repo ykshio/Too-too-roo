@@ -31,7 +31,7 @@ class CustomUser(models.Model):
 
     def get_username(self):
         # ページごとにカスタマイズして取得するロジックを記述
-        return self.user.username  # 例: デフォルトでは username を返す
+        return self.user.username  # self.userを通じてusernameを取得
     
     def save(self, *args, **kwargs):
         if self.profile_image:

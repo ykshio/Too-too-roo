@@ -78,7 +78,7 @@
                     <a class="nav-link" id="likes-tab" data-bs-toggle="tab" href="#likes" role="tab"
                         aria-controls="likes" aria-selected="false">
                         Likes
-                        <!-- ({{ likes_count }}) -->
+                        ({{ likes_count }})
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -101,12 +101,66 @@
                 <div class="tab-pane fade" id="likes" role="tabpanel" aria-labelledby="likes-tab">
                     {% include 'toot/user_likes.html' %}
                 </div>
-                <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab">
-                    {% include 'toot/user_followers.html' %}
+
+
+                <div class="tab-pane fade my-5" id="followers" role="tabpanel" aria-labelledby="followers-tab">
+                    <h3>{{ user_profile.display_name }}のフォロワー</h3>
+                    {% for follow in followers %}
+                    <div class="card my-3">
+                        <div class="card-body">
+                            <a href="{% url 'user_detail' follow.follower.pk %}" class="text-decoration-none text-dark">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if like.user.profile_image %}
+                                    <img src="{{ follow.follower.profile_image.url }}" alt="User Image" height="40"
+                                        class="rounded-circle">
+                                    {% else %}
+                                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                                    {% endif %}
+                                    <div class="mx-2">
+                                        {{ follow.follower.display_name }} @ {{ follow.follower.get_username }}
+
+                                    </div>
+                                    <div class="m-auto">
+                                        <span class="text-muted small">フォーローされた日時:{{ follow.follower.created_at|date:"Y年m月d日 H:i" }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>まだ誰からもフォローされてません。</p>
+                    {% endfor %}
                 </div>
-                <div class="tab-pane fade" id="following" role="tabpanel" aria-labelledby="following-tab">
-                    {% include 'toot/user_following.html' %}
+
+                <div class="tab-pane fade my-5" id="following" role="tabpanel" aria-labelledby="following-tab">
+                    <h3>{{ user_profile.display_name }}がフォロー中のユーザー</h3>
+                    {% for follow in following %}
+                    <div class="card my-3">
+                        <div class="card-body">
+                            <a href="{% url 'user_detail' follow.following.pk %}" class="text-decoration-none text-dark">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if like.user.profile_image %}
+                                    <img src="{{ follow.following.profile_image.url }}" alt="User Image" height="40"
+                                        class="rounded-circle">
+                                    {% else %}
+                                    <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                                    {% endif %}
+                                    <div class="mx-2">
+                                        {{ follow.following.display_name }} @ {{ follow.following.get_username }}
+
+                                    </div>
+                                    <div class="m-auto">
+                                        <span class="text-muted small">フォーローした日時:{{ follow.created_at|date:"Y年m月d日 H:i" }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>まだ誰もフォローしていません。</p>
+                    {% endfor %}
                 </div>
+
             </div>
         </div>
     </div>
@@ -127,11 +181,11 @@
             });
         });
     });
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const followButtons = document.querySelectorAll('.follow-btn');
 
         followButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
+            button.addEventListener('click', function (event) {
                 event.preventDefault();
 
                 const userId = this.getAttribute('data-user-id');
@@ -147,16 +201,16 @@
                         'X-CSRFToken': '{{ csrf_token }}'
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'followed' || data.status === 'unfollowed') {
-                        // フォロー・フォロー解除が成功した場合、ページをリロード
-                        location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'followed' || data.status === 'unfollowed') {
+                            // フォロー・フォロー解除が成功した場合、ページをリロード
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
             });
         });
     });
