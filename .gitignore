@@ -1,12 +1,12 @@
-# Byte-compiled / optimized / DLL files
+# Ignore generated files and directories
 __pycache__/
+src/tootooroo/main/__pycache__/
+src/tootooroo/__pycache__/
+src/tootooroo/main/migrations/__pycache__/
+src/tootooroo/main/templatetags/__pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 env/
 venv/
@@ -79,9 +79,3 @@ src/tootooroo/static/media/profile_images
 src/tootooroo/sqldiff
 src/tootooroo/sqlite3
 src/tootooroo/sqlite3_analyzer
-
-# Ignore Docker related files
-Dockerfile
-docker-compose.yml
-containers/
-
