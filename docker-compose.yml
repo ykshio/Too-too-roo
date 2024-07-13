@@ -23,4 +23,30 @@ services:
 
     command: ["python", "src/tootooroo/manage.py", "runserver", "0.0.0.0:8000"]
 
+# ヘルパーサービスを追加
+  makemigrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_makemigrations
+    command: ["python", "src/tootooroo/manage.py", "makemigrations"]
+    volumes:
+      - ./src/tootooroo:/root/workspace/src/tootooroo
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_migrate
+    command: ["python", "src/tootooroo/manage.py", "migrate"]
+    volumes:
+      - ./src/tootooroo:/root/workspace/src/tootooroo
+
+  createsuperuser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django_createsuperuser
+    command: ["python", "src/tootooroo/manage.py", "createsuperuser"]
+    volumes:
+      - ./src/tootooroo:/root/workspace/src/tootooroo
