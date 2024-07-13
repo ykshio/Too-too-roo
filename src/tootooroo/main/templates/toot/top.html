@@ -44,7 +44,7 @@
             aria-expanded="false">
             絞り込み
         </button>
-        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
             <li><a class="dropdown-item"
                     href="?filter=all{% if sort_option %}&sort={{ sort_option }}{% endif %}">全てのToot</a></li>
             <li><a class="dropdown-item"
@@ -53,6 +53,13 @@
             <li><a class="dropdown-item"
                     href="?filter=follower{% if sort_option %}&sort={{ sort_option }}{% endif %}">フォローされてる人のToot</a>
             </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            {% for department in departments %}
+            <li><a class="dropdown-item"
+                    href="?filter=department_{{ department.id }}{% if sort_option %}&sort={{ sort_option }}{% endif %}">{{ department.name }}</a></li>
+            {% endfor %}
         </ul>
     </div>
 </div>

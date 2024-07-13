@@ -3,7 +3,7 @@ from django.shortcuts import render,get_object_or_404, redirect
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.db.models import Count
-from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Department
 from main.forms import TootForm, ProfileEditForm,  ReplyForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -53,8 +53,8 @@ class TopView(LoginRequiredMixin, ListView):
     login_url = '/login/'
 
     def get_queryset(self):
-        sort_option = self.request.GET.get('sort', 'newest')  # デフォルトは新しい順
-        filter_option = self.request.GET.get('filter', 'all')  # デフォルトは全てのToot
+        sort_option = self.request.GET.get('sort', 'newest')
+        filter_option = self.request.GET.get('filter', 'all')
 
         if self.request.user.is_authenticated:
             user = CustomUser.objects.get(user=self.request.user)
@@ -65,6 +65,9 @@ class TopView(LoginRequiredMixin, ListView):
             elif filter_option == 'follower':
                 follower_users = Follow.objects.filter(following=user).values_list('follower', flat=True)
                 queryset = Toot.objects.filter(user__in=follower_users)
+            elif filter_option.startswith('department_'):
+                department_id = filter_option.split('_')[1]
+                queryset = Toot.objects.filter(user__department_id=department_id)
             else:
                 queryset = Toot.objects.all()
         else:
@@ -75,14 +78,14 @@ class TopView(LoginRequiredMixin, ListView):
         elif sort_option == 'most_likes':
             queryset = queryset.annotate(num_likes=Count('likes')).order_by('-num_likes', '-created_at')
         else:
-            queryset = queryset.order_by('-created_at')  # デフォルトは新しい順
+            queryset = queryset.order_by('-created_at')
 
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = TootForm()
-        
+
         if self.request.user.is_authenticated:
             user = CustomUser.objects.get(user=self.request.user)
             liked_toots = Like.objects.filter(user=user).values_list('toot_id', flat=True)
@@ -93,18 +96,18 @@ class TopView(LoginRequiredMixin, ListView):
             context['liked_toots'] = []
             context['following_count'] = 0
             context['followers_count'] = 0
-        
-        # プロフィール画像を含むユーザー情報をコンテキストに追加
+
         users = CustomUser.objects.all()
         user_profiles = {user.user.id: user for user in users}
         context['user_profiles'] = user_profiles
 
-        # 並び替えと絞り込みの選択オプションをコンテキストに追加
         context['sort_option'] = self.request.GET.get('sort', 'newest')
         context['filter_option'] = self.request.GET.get('filter', 'all')
 
-        return context
+        # Departmentの取得を追加
+        context['departments'] = Department.objects.all()
 
+        return context
 
 
 

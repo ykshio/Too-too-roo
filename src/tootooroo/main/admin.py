@@ -1,8 +1,8 @@
 from django.contrib import admin
-from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag, Department
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('user','display_name', 'bio', 'created_at', 'updated_at','background_color')
+    list_display = ('user', 'display_name', 'bio', 'created_at', 'updated_at', 'background_color', 'department')
     search_fields = ('user__username', 'bio')
 
 class TootAdmin(admin.ModelAdmin):
@@ -29,6 +29,10 @@ class RetootAdmin(admin.ModelAdmin):
     search_fields = ('toot__content', 'user__user__username')
     list_filter = ('created_at',)
 
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Toot, TootAdmin)
 admin.site.register(Follow, FollowAdmin)
@@ -36,3 +40,4 @@ admin.site.register(Reply, ReplyAdmin)
 admin.site.register(Like, LikeAdmin)
 admin.site.register(Retoot, RetootAdmin)
 admin.site.register(Hashtag)
+admin.site.register(Department, DepartmentAdmin)

@@ -6,6 +6,13 @@ from unidecode import unidecode
 from django.db.models import UniqueConstraint
 from PIL import Image 
 
+
+class Department(models.Model):
+    name = models.CharField('部署名', max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class CustomUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField(max_length=300,blank=True, null=True)
@@ -21,6 +28,7 @@ class CustomUser(models.Model):
     ]
     background_color = models.CharField('背景色', max_length=7, choices=BACKGROUND_COLOR_CHOICES, default='#343a40') # デフォルトはダークカラー
     display_name = models.CharField('表示名', max_length=30, default='', blank=True)   # 表示名フィールドを追加、デフォルトは空文字列
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
     
     def __str__(self):
         return f"{self.display_name} @ {self.user.username}" if self.display_name else self.user.username
@@ -157,3 +165,4 @@ class Retoot(models.Model):
         constraints = [
             UniqueConstraint(fields=['toot', 'user'], name='unique_retoot')
         ]
+

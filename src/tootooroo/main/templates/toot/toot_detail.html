@@ -13,7 +13,13 @@
                 <img src="{% static 'media/icon.png' %}" alt="Default Image" height="50">
                 {% endif %}
                 <div class="mx-2">
-                    <h5 class="mb-0">{{ toot.get_display_name }} <small class="text-muted">@ {{ toot.get_username }}</small></h5>
+                    <h5 class="mb-0">
+                        {{ toot.get_display_name }} 
+                        <small class="text-muted">@ {{ toot.get_username }}</small>
+                        {% if toot.user.department.name %}
+                        <small class="bg-warning text-light rounded p-1">{{ toot.user.department.name }}</small>
+                        {% endif %}
+                    </h5>
                     <small class="text-muted">{{ toot.created_at }}</small>
                 </div>
             </div>
@@ -63,7 +69,12 @@
                         <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
                         {% endif %}
                         <div class="mx-2">
-                            <h6 class="mb-0">{{ reply.get_display_name }} <small class="text-muted">@ {{ reply.get_username }}</small></h6>
+                            <h6 class="mb-0">
+                                {{ reply.get_display_name }} 
+                                <small class="text-muted">@ {{ reply.get_username }}</small>
+                                {% if toot.user.department.name %}
+                                <small class="bg-warning text-light rounded p-1">{{ reply.user.department.name }}</small>
+                                {% endif %}</h6>
                             <small class="text-muted">{{ reply.created_at }}</small>
                         </div>
                     </div>

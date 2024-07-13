@@ -22,7 +22,7 @@ class ProfileEditForm(forms.ModelForm):
     
     class Meta:
         model = CustomUser
-        fields = ['username', 'display_name', 'bio', 'profile_image', 'background_color']
+        fields = ['username', 'display_name', 'bio', 'profile_image', 'background_color','department']
         
     def clean_username(self):
         new_username = self.cleaned_data['username']

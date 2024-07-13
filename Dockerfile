@@ -1,4 +1,4 @@
-FROM python:3.9.11
+FROM python:3.11.2
 
 ENV PYTHONUNBUFFERED 1
 
@@ -27,9 +27,4 @@ RUN chmod +x /root/workspace/src/tootooroo/sqldiff \
 
 EXPOSE 8000
 
-#WORKDIR /root/workspace/src/tootooroo
-
-# Djangoの起動コマンド
-#ENTRYPOINT ["python", "manage.py"]
-#CMD ["runserver", "127.0.0.1:8000"]
 
