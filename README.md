@@ -18,6 +18,43 @@
 - ハッシュタグによる投稿の分類と検索
 - プロフィールの編集（username・表示名・プロフィール画像・自己紹介・部署）
 
+## インストール
+
+0. [Docker](https://www.docker.com/ja-jp/)をインストールして設定してください。
+1. リポジトリをクローンします:
+    ```bash
+    git clone https://github.com/ykshio/Too-too-roo.git
+    cd Too-too-roo
+    ```
+2. Dockerを使用してプロジェクトをビルドします:
+    ```bash
+    docker-compose build
+    ```
+   このコマンドは、Dockerfileを基にイメージを作成します。これにより、プロジェクトに必要な環境が整います。
+
+3. マイグレーションを作成します:
+    ```bash
+    docker-compose run makemigrations
+    ```
+
+4. データベースをマイグレートします:
+    ```bash
+    docker-compose run migrate
+    ```
+
+5. スーパーユーザーを作成します:
+    ```bash
+    docker-compose run createsuperuser
+    ```
+
+6. Dockerを使用してプロジェクトを起動します:
+    ```bash
+    docker-compose up
+    ```
+
+これで、ブラウザから`http://localhost:8000`にアクセスすることで、アプリケーションを利用できるようになります。
+
+
 ## 開発経緯
 - 大学のサーバープログラミング演習の課題として作成
 - 自分たちだけのTwitterを作ろうということでサービス名「TooTooRoo!」とした
