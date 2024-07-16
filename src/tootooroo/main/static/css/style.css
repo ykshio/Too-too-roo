@@ -107,3 +107,21 @@ main {
     opacity: 0.65; /* スタイルの調整 */
     pointer-events: none; /* クリックを無効化 */
 }
+
+
+
+.position-relative {
+    position: relative; /* 親要素を相対位置に設定 */
+}
+
+.position-absolute {
+    position: absolute; /* バッジを絶対位置に設定 */
+    top: -5px;         /* アイコンの上に配置 */
+    right: -10px;      /* アイコンの右に配置 */
+    height: 20px;      /* 高さを設定 */
+    width: 20px;       /* 幅を設定 */
+    border-radius: 100%; /* 正円にする */
+    display: flex;     /* 中央揃えのためにフレックスボックスを使用 */
+    align-items: center; /* 垂直方向の中央揃え */
+    justify-content: center; /* 水平方向の中央揃え */
+}

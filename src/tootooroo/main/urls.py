@@ -34,5 +34,10 @@ urlpatterns = [
     path('hashtag/<int:id>/', views.HashtagDetailView.as_view(), name='hashtag_detail'),
     path('toot/<int:toot_id>/likes/', views.toot_likes, name='toot_likes'),
     path('change-background-color/', views.change_background_color, name='change_background_color'),
+    # path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/', views.NotificationListView.as_view(), name='notification_list'),
+    path('notifications/read/<int:pk>/', views.NotificationReadView.as_view(), name='notification_read'),
+    path('notifications/mark_all_as_read/', views.mark_all_as_read, name='mark_all_as_read'),
+    path('notifications/count/', views.NotificationCountView.as_view(), name='notification_count'),
 
 ]

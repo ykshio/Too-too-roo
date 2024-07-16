@@ -1,9 +1,13 @@
+.DS_Store
+
+
 # Ignore generated files and directories
 __pycache__/
 src/tootooroo/main/__pycache__/
 src/tootooroo/__pycache__/
 src/tootooroo/main/migrations/__pycache__/
 src/tootooroo/main/templatetags/__pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 *.so

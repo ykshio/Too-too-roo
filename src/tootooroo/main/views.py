@@ -3,7 +3,7 @@ from django.shortcuts import render,get_object_or_404, redirect
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.db.models import Count
-from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Department
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Department, Notification
 from main.forms import TootForm, ProfileEditForm,  ReplyForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -92,6 +92,7 @@ class TopView(LoginRequiredMixin, ListView):
             context['liked_toots'] = liked_toots
             context['following_count'] = user.following.count()
             context['followers_count'] = user.followers.count()
+            context['unread_notifications_count'] = Notification.objects.filter(user=user, is_read=False).count()
         else:
             context['liked_toots'] = []
             context['following_count'] = 0
@@ -106,6 +107,7 @@ class TopView(LoginRequiredMixin, ListView):
 
         # Departmentの取得を追加
         context['departments'] = Department.objects.all()
+        
 
         return context
 
@@ -294,6 +296,16 @@ class UserFollowView(LoginRequiredMixin,RedirectView):
         follower = self.request.user.customuser
         following = get_object_or_404(CustomUser, pk=kwargs['pk'])
         Follow.objects.get_or_create(follower=follower, following=following)
+        follow, created = Follow.objects.get_or_create(follower=follower, following=following)
+        
+        if created:
+            # フォロー成功時に通知を作成
+            notification = Notification(
+                user=following,
+                from_user=follower,
+                notification_type=Notification.FOLLOW
+            )
+            notification.save()
         return super().get_redirect_url(*args, **kwargs)
 
 @login_required
@@ -525,9 +537,20 @@ def custom_404_view(request, exception):
 @login_required
 def follow_user(request, pk):
     user_to_follow = get_object_or_404(CustomUser, pk=pk)
+
     if not Follow.objects.filter(follower=request.user.customuser, following=user_to_follow).exists():
         Follow.objects.create(follower=request.user.customuser, following=user_to_follow)
+
+        # 通知を作成
+        Notification.objects.create(
+            user=user_to_follow,  # 通知を受け取るユーザー
+            from_user=request.user.customuser,  # フォローしたユーザー
+            notification_type=Notification.FOLLOW,
+            message=f"{request.user.customuser.display_name}があなたをフォローしました。"
+        )
+
         return JsonResponse({'status': 'followed'})
+    
     return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
@@ -548,3 +571,50 @@ def following_list(request, username):
     user = get_object_or_404(CustomUser, user__username=username)
     following = user.following.all()  # フォロー中のユーザーを取得
     return render(request, 'following.html', {'user': user, 'following': following})
+
+
+
+from django.shortcuts import get_object_or_404
+
+from django.utils import timezone
+
+class NotificationListView(LoginRequiredMixin, ListView):
+    model = Notification
+    template_name = 'toot/notification_list.html'
+    context_object_name = 'notifications'
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user.customuser).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['unread_count'] = Notification.objects.filter(user=self.request.user.customuser, is_read=False).count()
+        return context
+
+class NotificationReadView(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        notification = get_object_or_404(Notification, pk=kwargs['pk'])
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save()
+
+        # 適切なリダイレクトURLを設定
+        if notification.notification_type in [Notification.TOOT, Notification.REPLY, Notification.LIKE, Notification.MENTION]:
+            return reverse('toot_detail', kwargs={'pk': notification.toot.pk})
+        elif notification.notification_type == Notification.FOLLOW:
+            return reverse('user_detail', kwargs={'pk': notification.from_user.pk})
+        return reverse('notification_list')
+    
+    
+    
+@login_required
+def mark_all_as_read(request):
+    Notification.objects.filter(user=request.user.customuser, is_read=False).update(is_read=True)
+    return redirect('notification_list')
+
+
+class NotificationCountView(LoginRequiredMixin, View):
+    def get(self, request):
+        unread_count = Notification.objects.filter(user=request.user.customuser, is_read=False).count()
+        return JsonResponse({'unread_count': unread_count})

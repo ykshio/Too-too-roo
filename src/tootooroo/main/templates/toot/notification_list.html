@@ -1,0 +1,58 @@
+{% extends "toot/base.html" %}
+{% load static %}
+{% block main %}
+<div class="container mt-5">
+    <h2>通知一覧</h2>
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <span class="me-2">未読の通知数: {{ unread_count }}</span>
+        <form action="{% url 'mark_all_as_read' %}" method="post" style="display: inline;" class="align-self-center">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary btn-sm align-self-center">全てを既読にする</button>
+        </form>
+    </div>
+    <ul class="list-group">
+        {% for notification in notifications %}
+        <li class="list-group-item {% if not notification.is_read %}list-group-item-info{% endif %}">
+            <div class="d-flex align-items-center">
+                {% if notification.from_user.customuser.profile_image %}
+                <img src="{{ notification.from_user.customuser.profile_image.url }}" class="rounded-circle"
+                    height="40px" alt="{{ notification.from_user.username }}">
+                {% else %}
+                <img src="{% static 'media/icon.png' %}" height="40px" alt="{{ notification.from_user.username }}">
+                {% endif %}
+                <div class="ms-3">
+                    <a href="{% if notification.notification_type == 'follow' %}
+                                {% url 'notification_read' notification.pk %}?next={% url 'user_detail' notification.from_user.pk %}
+                             {% else %}
+                                {% url 'notification_read' notification.pk %}?next={% url 'toot_detail' notification.toot.pk %}
+                             {% endif %}" class="stretched-link">
+                        {{ notification.from_user.customuser.display_name|default:notification.from_user.user.username }}@{{ notification.from_user.user.username }}
+                    </a>
+                    {% if notification.notification_type == 'follow' %}
+                    さんがあなたをフォローしました。
+                    <small><a href="{% url 'user_detail' notification.from_user.pk %}"></a></small>
+                    {% elif notification.notification_type == 'toot' %}
+                    さんがトゥートしました。<br>
+                    <small><a href="{% url 'toot_detail' notification.toot.pk %}">{{ notification.toot.content|truncatewords:10 }}</a></small>
+                    {% elif notification.notification_type == 'like' %}
+                    さんがあなたのトゥートにいいねしました。<br>
+                    <small><a href="{% url 'toot_detail' notification.toot.pk %}">{{ notification.toot.content|truncatewords:10 }}</a></small>
+                    {% elif notification.notification_type == 'reply' %}
+                    さんがあなたのトゥートにリプライしました。<br>
+                    <small><a href="{% url 'toot_detail' notification.toot.pk %}">{{ notification.toot.content|truncatewords:10 }}</a></small>
+                    {% elif notification.notification_type == 'mention' %}
+                    さんがあなたをメンションしました。<br>
+                    <small><a href="{% url 'toot_detail' notification.toot.pk %}">{{ notification.toot.content|truncatewords:10 }}</a></small>
+                    {% else %}
+                    <small class="text-danger">通知タイプ不明: {{ notification.notification_type }}</small>
+                    {% endif %}
+                    <small class="text-muted d-block">{{ notification.created_at|date:"Y年m月d日 H:i" }}</small>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <li class="list-group-item">通知はありません。</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

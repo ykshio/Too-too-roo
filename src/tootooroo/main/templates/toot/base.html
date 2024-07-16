@@ -149,10 +149,21 @@
                             <i class="fa-solid fa-magnifying-glass fs-1"></i>
                         </a>
                     </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link text-light fs-3" href="{% url 'notification_list' %}">
+                            <i class="fa-solid fa-bell fs-1"></i>
+                            {% if unread_count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger py-2">
+                                    {{ unread_count }}
+                                </span>
+                            {% endif %}
+                        </a>
+                    </li>                 
                 </ul>
             </div>
         </div>
     </footer>
+
 
     <!-- モーダルの追加 -->
     <div class="modal" id="tootModal" tabindex="-1" aria-labelledby="tootModalLabel" aria-hidden="true">
@@ -342,6 +353,22 @@
         contentInput.addEventListener('input', checkInputValidity);
         checkInputValidity(); // ページロード時にチェックを実行
 
+        function updateNotificationCount() {
+        fetch("{% url 'notification_count' %}")  // 未読通知数を取得するURLを指定
+            .then(response => response.json())
+            .then(data => {
+                const bellBadge = document.querySelector('.badge');
+                if (data.unread_count > 0) {
+                    bellBadge.innerText = data.unread_count;
+                    bellBadge.style.display = 'block'; // バッジを表示
+                } else {
+                    bellBadge.style.display = 'none'; // バッジを非表示
+                }
+            });
+    }
+
+    // 10秒ごとに更新
+    setInterval(updateNotificationCount, 10000);
     </script>
 </body>
 

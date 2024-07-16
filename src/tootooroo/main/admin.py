@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag, Department
+from main.models import CustomUser, Toot, Follow, Reply, Like, Retoot, Hashtag, Department, Notification
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ('user', 'display_name', 'bio', 'created_at', 'updated_at', 'background_color', 'department')
@@ -33,6 +33,13 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'from_user', 'notification_type', 'toot', 'message', 'is_read', 'created_at')
+    search_fields = ('user__username', 'from_user__username', 'message')
+    list_filter = ('is_read', 'notification_type', 'created_at')
+
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Toot, TootAdmin)
 admin.site.register(Follow, FollowAdmin)
@@ -41,3 +48,4 @@ admin.site.register(Like, LikeAdmin)
 admin.site.register(Retoot, RetootAdmin)
 admin.site.register(Hashtag)
 admin.site.register(Department, DepartmentAdmin)
+admin.site.register(Notification, NotificationAdmin)

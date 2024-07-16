@@ -14,7 +14,7 @@
                 {% endif %}
                 <div class="mx-2">
                     <h5 class="mb-0">
-                        {{ toot.get_display_name }} 
+                        {{ toot.get_display_name }}
                         <small class="text-muted">@ {{ toot.get_username }}</small>
                         {% if toot.user.department.name %}
                         <small class="bg-warning text-light rounded p-1">{{ toot.user.department.name }}</small>
@@ -28,7 +28,8 @@
             <p class="mb-0">{{ toot.content |linebreaksbr|urlize }}</p>
             <div class="mt-2">
                 {% for hashtag in toot.hashtags.all %}
-                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name }}</a>
+                <a href="{% url 'hashtag_detail' hashtag.id %}" class="badge bg-primary text-light">#{{ hashtag.name
+                    }}</a>
                 {% endfor %}
             </div>
         </div>
@@ -61,26 +62,31 @@
             {% for reply in replies %}
             <div class="card my-2">
                 <div class="card-body">
+                    <a href="{% url 'user_detail' reply.user.pk %}" class="text-reset text-decoration-none">
                     <div class="d-flex align-items-center">
                         {% if reply.user.profile_image %}
-                        <img src="{{ reply.user.profile_image.url }}" alt="User Image" height="40"
-                            class="rounded-circle">
-                        {% else %}
-                        <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
-                        {% endif %}
-                        <div class="mx-2">
-                            <h6 class="mb-0">
-                                {{ reply.get_display_name }} 
-                                <small class="text-muted">@ {{ reply.get_username }}</small>
-                                {% if toot.user.department.name %}
-                                <small class="bg-warning text-light rounded p-1">{{ reply.user.department.name }}</small>
-                                {% endif %}</h6>
-                            <small class="text-muted">{{ reply.created_at }}</small>
-                        </div>
+                        
+                            <img src="{{ reply.user.profile_image.url }}" alt="User Image" height="40"
+                                class="rounded-circle">
+                            {% else %}
+                            <img src="{% static 'media/icon.png' %}" alt="Default Image" height="40">
+                            {% endif %}
+                            <div class="mx-2">
+                                <h6 class="mb-0">
+                                    {{ reply.get_display_name }}
+                                    <small class="text-muted">@ {{ reply.get_username }}</small>
+                                    {% if toot.user.department.name %}
+                                    <small class="bg-warning text-light rounded p-1">{{ reply.user.department.name }}</small>
+                                    {% else %}
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">{{ reply.created_at }}</small>
+                            </div>
                     </div>
                     <div class="mt-2">
                         <p class="mb-0">{{ reply.content |linebreaksbr|urlize }}</p>
                     </div>
+                    </a>
                     {% if request.user == reply.user.user %}
                     <div class="mt-2">
                         <form action="{% url 'delete_reply' reply.id %}" method="post"
@@ -177,21 +183,21 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-    const replyTextarea = document.querySelector('#replyModal textarea[name="content"]');
-    let isSubmitting = false; // 送信中かどうかを示すフラグ
-    var replyModal = document.getElementById('replyModal');
-    replyModal.addEventListener('shown.bs.modal', function () {
-        replyTextarea.focus();
-    });
-    replyTextarea.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            e.preventDefault();
-            if (!isSubmitting) { // フォームがまだ送信されていない場合のみ送信
-                isSubmitting = true; // 送信中フラグを設定
-                document.getElementById('replyForm').submit();
+        const replyTextarea = document.querySelector('#replyModal textarea[name="content"]');
+        let isSubmitting = false; // 送信中かどうかを示すフラグ
+        var replyModal = document.getElementById('replyModal');
+        replyModal.addEventListener('shown.bs.modal', function () {
+            replyTextarea.focus();
+        });
+        replyTextarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                if (!isSubmitting) { // フォームがまだ送信されていない場合のみ送信
+                    isSubmitting = true; // 送信中フラグを設定
+                    document.getElementById('replyForm').submit();
+                }
             }
-        }
+        });
     });
-});
 </script>
 {% endblock %}
