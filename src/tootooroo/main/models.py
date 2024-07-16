@@ -19,13 +19,15 @@ class CustomUser(models.Model):
     created_at = models.DateTimeField('アカウント作成日', auto_now_add=True)
     updated_at = models.DateTimeField('アカウント更新日', auto_now=True)
     BACKGROUND_COLOR_CHOICES = [
-        ('#343a40', 'ダークカラー'),
-        ('#f8f9fa', 'ライトカラー'),
-        ('#007bff', 'ブルー'),
-        ('#28a745', 'グリーン'),
-        ('#dc3545', 'レッド'),
+        ('bg-dark', 'ダークカラー'),
+        ('bg-blue', 'ブルー'),
+        ('bg-green', 'グリーン'),
+        ('bg-red', 'レッド'),
+        ('bg-orange', 'オレンジ'),
+        ('bg-purple', 'パープル'),
+        ('bg-gray', 'グレー'),
     ]
-    background_color = models.CharField('背景色', max_length=7, choices=BACKGROUND_COLOR_CHOICES, default='#343a40')
+    background_color = models.CharField('背景色',max_length=20, choices=BACKGROUND_COLOR_CHOICES, default='bg-dark')
     display_name = models.CharField('表示名', max_length=30, default='', blank=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name='users')
 

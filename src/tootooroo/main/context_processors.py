@@ -7,3 +7,10 @@ def unread_notification_count(request):
     else:
         unread_count = 0
     return {'unread_count': unread_count}
+
+
+def user_background_color(request):
+    if request.user.is_authenticated:
+        custom_user = request.user.customuser
+        return {'background_color': custom_user.background_color}
+    return {}

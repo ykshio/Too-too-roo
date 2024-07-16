@@ -621,7 +621,11 @@ class NotificationCountView(LoginRequiredMixin, View):
     
 def notification_count(request):
     if request.user.is_authenticated:
-        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+        unread_count = Notification.objects.filter(user=CustomUser, is_read=False).count()
     else:
         unread_count = 0
     return JsonResponse({'unread_count': unread_count})
+
+def color_view(request):
+    background_color = request.user.customuser.background_color if request.user.is_authenticated else '#343a40'
+    return render(request, 'base.html', {'background_color': background_color})

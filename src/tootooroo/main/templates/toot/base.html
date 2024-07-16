@@ -14,10 +14,33 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% if user.is_authenticated %}
     {% endif %}
+    <style>
+        .bg-blue {
+            background-color: #007bff;
+        }
+
+        .bg-green {
+            background-color: #28a745;
+        }
+
+        .bg-red {
+            background-color: #b81323 ;
+        }
+        .bg-orange{
+            background-color: #fd7e14;
+        }
+        .bg-purple{
+            background-color: #6f42c1;
+        }
+        .bg-gray{
+            background-color: #4f5357;
+        }
+    </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand flex-md-row navbar-dark bg-dark py-0 fixed-top">
+    <nav
+        class="navbar navbar-expand flex-md-row navbar-dark  py-0 fixed-top {% if user.is_authenticated %}{{ user.customuser.background_color }}{% else %}bg-dark{% endif %}">
         <div class="container justify-content-between">
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
@@ -48,8 +71,8 @@
         </div>
     </nav>
 
-    <div class="offcanvas offcanvas-start custom-offcanvas bg-dark text-light" tabindex="-1" id="offcanvasMenu"
-        aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas offcanvas-start custom-offcanvas {% if user.is_authenticated %}{{ user.customuser.background_color }}{% else %}bg-dark text-light{% endif %}"
+        tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
         <div class="offcanvas-header">
             {% if user.is_authenticated %}
             <a class="nav-link" href="{% url 'user_detail' user.id %}">
@@ -125,7 +148,8 @@
     </main>
 
     <footer class="fixed-bottom footer">
-        <div class="bottom-navbar bg-dark py-2">
+        <div
+            class="bottom-navbar {% if user.is_authenticated %}{{ user.customuser.background_color }}{% else %}bg-dark{% endif %} py-2">
             <div class="container">
                 <ul class="nav justify-content-around">
                     <li class="nav-item">
@@ -153,12 +177,13 @@
                         <a class="nav-link text-light fs-3" href="{% url 'notification_list' %}">
                             <i class="fa-solid fa-bell fs-1"></i>
                             {% if unread_count > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger py-2">
-                                    {{ unread_count }}
-                                </span>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger py-2">
+                                {{ unread_count }}
+                            </span>
                             {% endif %}
                         </a>
-                    </li>                 
+                    </li>
                 </ul>
             </div>
         </div>
@@ -354,21 +379,21 @@
         checkInputValidity(); // ページロード時にチェックを実行
 
         function updateNotificationCount() {
-        fetch("{% url 'notification_count' %}")  // 未読通知数を取得するURLを指定
-            .then(response => response.json())
-            .then(data => {
-                const bellBadge = document.querySelector('.badge');
-                if (data.unread_count > 0) {
-                    bellBadge.innerText = data.unread_count;
-                    bellBadge.style.display = 'block'; // バッジを表示
-                } else {
-                    bellBadge.style.display = 'none'; // バッジを非表示
-                }
-            });
-    }
+            fetch("{% url 'notification_count' %}")  // 未読通知数を取得するURLを指定
+                .then(response => response.json())
+                .then(data => {
+                    const bellBadge = document.querySelector('.badge');
+                    if (data.unread_count > 0) {
+                        bellBadge.innerText = data.unread_count;
+                        bellBadge.style.display = 'block'; // バッジを表示
+                    } else {
+                        bellBadge.style.display = 'none'; // バッジを非表示
+                    }
+                });
+        }
 
-    // 10秒ごとに更新
-    setInterval(updateNotificationCount, 10000);
+        // 10秒ごとに更新
+        setInterval(updateNotificationCount, 10000);
     </script>
 </body>
 

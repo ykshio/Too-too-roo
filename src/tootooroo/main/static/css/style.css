@@ -125,3 +125,25 @@ main {
     align-items: center; /* 垂直方向の中央揃え */
     justify-content: center; /* 水平方向の中央揃え */
 }
+
+
+.bg-blue {
+    background-color: #007bff;
+}
+
+.bg-green {
+    background-color: #28a745;
+}
+
+.bg-red {
+    background-color: #c82333;
+}
+.bg-orange{
+    background-color: #fd7e14;
+}
+.bg-purple{
+    background-color: #6f42c1;
+}
+.bg-gray{
+    background-color: #4f5357;
+}
