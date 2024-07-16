@@ -618,3 +618,10 @@ class NotificationCountView(LoginRequiredMixin, View):
     def get(self, request):
         unread_count = Notification.objects.filter(user=request.user.customuser, is_read=False).count()
         return JsonResponse({'unread_count': unread_count})
+    
+def notification_count(request):
+    if request.user.is_authenticated:
+        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    else:
+        unread_count = 0
+    return JsonResponse({'unread_count': unread_count})
