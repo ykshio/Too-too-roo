@@ -24,30 +24,18 @@
         }
 
         .bg-red {
-            background-color: #b81323;
+            background-color: #b81323 ;
         }
-
-        .bg-orange {
+        .bg-orange{
             background-color: #fd7e14;
         }
-
-        .bg-purple {
+        .bg-purple{
             background-color: #6f42c1;
         }
-
-        .bg-gray {
+        .bg-gray{
             background-color: #4f5357;
         }
     </style>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MP96H4H3Q7"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-MP96H4H3Q7');
-    </script>
 </head>
 
 <body>
@@ -217,8 +205,7 @@
                         {% bootstrap_form form %}
                         {% endif %}
                         <div class="mb-3">
-                            <span id="char-count">0</span> / <span id="max-char-count">{{ form.content.field.max_length
-                                }}</span> 文字
+                            <span id="char-count">0</span> / <span id="max-char-count">{{ form.content.field.max_length }}</span> 文字
                             <span id="char-limit-msg" style="color: red; display: none;">文字数制限に達しました</span>
                         </div>
                         <div class="text-end">
@@ -299,8 +286,8 @@
                         method: 'POST',
                         body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest', // Django の Ajax CSRF 対策用
-                            'X-CSRFToken': '{{ csrf_token }}' // CSRF トークンのセット
+                            'X-Requested-With': 'XMLHttpRequest',  // Django の Ajax CSRF 対策用
+                            'X-CSRFToken': '{{ csrf_token }}'     // CSRF トークンのセット
                         }
                     })
                         .then(response => response.json())
@@ -392,7 +379,7 @@
         checkInputValidity(); // ページロード時にチェックを実行
 
         function updateNotificationCount() {
-            fetch("{% url 'notification_count' %}") // 未読通知数を取得するURLを指定
+            fetch("{% url 'notification_count' %}")  // 未読通知数を取得するURLを指定
                 .then(response => response.json())
                 .then(data => {
                     const bellBadge = document.querySelector('.badge');
