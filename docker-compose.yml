@@ -1,50 +1,31 @@
 services:
   django:
     build:
-      context: .    # Dockerfileがあるディレクトリまでの相対パス
-      dockerfile: Dockerfile   # Dockerfileのファイル名
+      context: .
+      dockerfile: Dockerfile
+    container_name: tootooroo_django
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./db.sqlite3:/root/workspace/src/tootooroo/db.sqlite3
+      - ./mediafiles:/root/workspace/src/tootooroo/mediafiles
+      - staticfiles:/root/workspace/src/tootooroo/staticfiles
+    expose:
+      - "8000"
 
-    container_name: django
-
+  nginx:
+    image: nginx:alpine
+    container_name: tootooroo_nginx
+    restart: unless-stopped
     ports:
-      - "8000:8000"
-    
-    tty: true
-
+      - "80:80"
     volumes:
-      - ./src/tootooroo:/root/workspace/src/tootooroo  # ローカルの作業ディレクトリと仮想環境の作業ディレクトリの対応づけ
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./mediafiles:/var/www/media:ro
+      - staticfiles:/var/www/static:ro
+    depends_on:
+      - django
 
-    environment:
-      - DEBUG=True
-      - COMPOSE_HTTP_TIMEOUT=200
-      - COMPOSE_LOG_LEVEL=DEBUG
-
-    command: ["python", "src/tootooroo/manage.py", "runserver", "0.0.0.0:8000"]
-
-# ヘルパーサービスを追加
-  makemigrations:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: django_makemigrations
-    command: ["python", "src/tootooroo/manage.py", "makemigrations"]
-    volumes:
-      - ./src/tootooroo:/root/workspace/src/tootooroo
-
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: django_migrate
-    command: ["python", "src/tootooroo/manage.py", "migrate"]
-    volumes:
-      - ./src/tootooroo:/root/workspace/src/tootooroo
-
-  createsuperuser:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: django_createsuperuser
-    command: ["python", "src/tootooroo/manage.py", "createsuperuser"]
-    volumes:
-      - ./src/tootooroo:/root/workspace/src/tootooroo
+volumes:
+  staticfiles:

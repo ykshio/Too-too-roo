@@ -83,3 +83,9 @@ src/tootooroo/static/media/profile_images
 src/tootooroo/sqldiff
 src/tootooroo/sqlite3
 src/tootooroo/sqlite3_analyzer
+
+# Production
+.env
+db.sqlite3
+mediafiles/
+staticfiles/
